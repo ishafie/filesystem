@@ -23,6 +23,7 @@ typedef struct filesystem {
   int nb_files;
   inode tab_inode[MAXBLOC];
   void *data;
+  int fd;
 } t_fs;
 
 typedef struct super_block {
