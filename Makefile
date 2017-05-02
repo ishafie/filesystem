@@ -15,14 +15,16 @@ NAME		=				filesystem
 SRC			=				main.c						\
 								create_filesystem.c \
 								err.c \
-								create_inode.c
+								create_inode.c \
+								create_folder.c \
+								create_blocks.c \
 
 
 OBJ_NAME	=		$(SRC:.c=.o)
 OBJ_PATH	=		obj/
 OBJ			=		$(addprefix $(OBJ_PATH), $(OBJ_NAME))
 
-FLAGS		=		-Wall -Wextra -Werror
+FLAGS		=		-Wall -Wextra -g
 
 .PHONY: all, clean, fclean, re
 
