@@ -19,6 +19,7 @@ int create_filesystem(char *fs_name, t_fs *fs)
 {
   void *memory;
   int fd;
+  int fd2;
   struct stat sb;
 
   fd = open(fs_name, O_RDWR, 0755);
@@ -29,8 +30,11 @@ int create_filesystem(char *fs_name, t_fs *fs)
   memory = mmap(NULL, sb.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
   if (memory == MAP_FAILED)
     err_handler("mmap");
+  /* TESTS */
+  fd2 = open("test.txt", O_RDWR, 0755);
+  /* /TESTS */
   create_blocks(fs);
-  init_filesystem(fs, memory, sb, fd);
+  init_filesystem(fs, memory, sb, fd2);
   create_folder(fs, ".", 0);
   fs->nb_files += 1;
   fs->i_currentfolder = 0;
@@ -38,11 +42,7 @@ int create_filesystem(char *fs_name, t_fs *fs)
 }
 
 int add_file_to_filestruct(t_fs *fs, int pos, struct stat sb, char *name) {
-  fs->tab_inode[fs->nb_files].pos = pos;
-  fs->tab_inode[fs->nb_files].file.size = sb.st_size;
-  ft_strcpy(fs->tab_inode[fs->nb_files].file.name, name);
-  fs->tab_inode[fs->nb_files].file.name_len = ft_strlen(name);
-  fs->tab_inode[fs->nb_files].file.type = TYPEFILE;
+
   return (1);
 }
 
@@ -64,9 +64,9 @@ int add_file_to_fs(char *filename, t_fs *fs) {
   tmp = (char*)mmap(fs->data + pos, sb.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
   lseek(fs->fd, SEEK_SET, pos);
   write(fs->fd, tmp, sb.st_size);
-  add_file_to_filestruct(fs, pos + sb.st_size, sb, filename);
+  /*add_file_to_filestruct(fs, pos + sb.st_size, sb, filename);
   setbusy(fs, fs->nb_files);
-  add_to_superblock(fs);
+  add_to_superblock(fs);*/
   fs->nb_files += 1;
   return (1);
 }

@@ -4,12 +4,14 @@
 #define BUFFER_STR 255
 #define MAX_POS 9
 #define MAX_SIZE 9
+#define MAX_FILES 128
 #define MAX_NAMELEN 3
 #define SIZETOTAL 400000000
 #define SIZEBLOC 1024
 #define FIRSTLINE 255
 #define SIZEINODELINE 277
-#define SIZEHEADER (SIZETOTAL / SIZEBLOC) * SIZEINODELINE + FIRSTLINE
+// #define SIZEHEADER (SIZETOTAL / SIZEBLOC) * SIZEINODELINE + FIRSTLINE
+#define SIZEHEADER FIRSTLINE
 #define MAXBLOC (SIZETOTAL - SIZEHEADER) / SIZEBLOC
 #define FALSE 0
 #define TRUE 1
@@ -25,24 +27,33 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-typedef struct my_file {
-	int size;
-	int name_len;
-	int type;
-	char name[BUFFER_STR];
-} my_file;
-
-typedef struct inode {
-	char inode[SIZEINODELINE];
-	unsigned long pos;
-	my_file file;
-} inode;
 
 typedef struct blocks {
 	int pos;
 	int available;
 	int inode;
 }	blocks;
+
+typedef struct inode {
+	int available;
+	char inode[SIZEINODELINE];
+	unsigned long pos;
+	struct timespec i_atime;
+  struct timespec i_mtime;
+  struct timespec i_ctime;
+	int size;
+	int name_len;
+	int type;
+	char name[BUFFER_STR];
+	char path[BUFFER_STR];
+	struct blocks *block;
+} inode;
+
+typedef struct myfolder {
+	int inode;
+	int inodes[MAX_FILES];
+	struct myfolder *children;
+} myfolder;
 
 typedef struct super_block {
 	int pos;
@@ -57,6 +68,7 @@ typedef struct filesystem {
   int fd;
 	blocks blocks[MAXBLOC];
 	superblock s_block;
+	struct myfolder *folder;
 } t_fs;
 
 
