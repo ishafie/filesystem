@@ -22,6 +22,7 @@ int create_blocks(t_fs *fs) {
   while (i < MAXBLOC) {
     fs->blocks[i].pos = pos;
     fs->blocks[i].available = TRUE;
+    fs->blocks[i].inode = 0;
     pos += SIZEBLOC;
     i++;
   }

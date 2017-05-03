@@ -17,3 +17,7 @@ int search_available_block(t_fs *fs, int size) {
   }
   return (-1);
 }
+
+void setbusy(t_fs *fs, int inode) {
+  fs->blocks[inode].available = FALSE;
+}

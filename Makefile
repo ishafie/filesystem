@@ -18,6 +18,8 @@ SRC			=				main.c						\
 								create_inode.c \
 								create_folder.c \
 								create_blocks.c \
+								action_blocks.c \
+								create_superblock.c \
 
 
 OBJ_NAME	=		$(SRC:.c=.o)
