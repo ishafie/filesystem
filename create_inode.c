@@ -20,25 +20,21 @@ int fill_inode(char inode[SIZEINODELINE], char *name, int max, int index) {
   }
   return (index);
 }
-
-void create_inode(t_fs *fs, int i) {
-  char *pos_str;
-  char *size_str;
-  char *name_len;
-  char type;
-  int index;
-
-  index = 0;
-  pos_str = ft_itoa(fs->tab_inode[i].pos);
-  size_str = ft_itoa(fs->tab_inode[i].file.size);
-  name_len = ft_itoa(fs->tab_inode[i].file.name_len);
-  type = fs->tab_inode[i].type;
-  index = fill_inode(fs->tab_inode[i].inode, pos_str, MAX_POS);
-  index = fill_inode(fs->tab_inode[i].inode, pos_str, MAX_SIZE);
-  index = fill_inode(fs->tab_inode[i].inode, pos_str, MAX_NAMELEN);
-  fs->tab_inode[i].inode[index] = fs->tab_inode[i].type;
-  free(pos_str);
-  free(size_str);
-  free(name_len);
-}
 */
+void create_inode(t_fs *fs, char *name, int i, int pos, int size, int type) {
+  // comment relier un inode a ses blocks ?
+  fs->tab_inode[i].available = FALSE;
+  fs->tab_inode[i].pos = pos;
+  fs->tab_inode[i].i_atime = ;
+  fs->tab_inode[i].i_mtime = ;
+  fs->tab_inode[i].i_ctime = ;
+  fs->tab_inode[i].size = size;
+  fs->tab_inode[i].name_len = ft_strlen(name);
+  fs->tab_inode[i].type = type;
+  ft_strcpy(fs->tab_inode[i].name, name);
+  if (fs->i_currentfolder != i)
+    ft_strcpy(fs->tab_inode[i].path, fs->tab_inode[fs->[i_currentfolder]].path);
+  ft_strcat(fs->tab_inode[i].path, name);
+  ft_strcat(fs->tab_inode[i].path, "/");
+  fs->tab_inode[i].blocks = NULL;
+}

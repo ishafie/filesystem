@@ -6,17 +6,20 @@
 #define MAX_SIZE 9
 #define MAX_FILES 128
 #define MAX_NAMELEN 3
+#define MAX_TIME 9
+#define MAX_INODE 9
 #define SIZETOTAL 400000000
 #define SIZEBLOC 1024
-#define FIRSTLINE 255
+#define TYPEFILE 0
+#define TYPEFOLDER 1
+#define FIRSTLINE MAX_POS + MAX_SIZE + MAX_FILES + MAX_NAMELEN + MAX_TIME * 3 + MAX_INODE + TYPEFILE
 #define SIZEINODELINE 277
 // #define SIZEHEADER (SIZETOTAL / SIZEBLOC) * SIZEINODELINE + FIRSTLINE
 #define SIZEHEADER FIRSTLINE
 #define MAXBLOC (SIZETOTAL - SIZEHEADER) / SIZEBLOC
 #define FALSE 0
 #define TRUE 1
-#define TYPEFILE 0
-#define TYPEFOLDER 1
+
 
 #include "libft.h"
 #include <stdio.h>
@@ -37,7 +40,7 @@ typedef struct blocks {
 typedef struct inode {
 	int available;
 	char inode[SIZEINODELINE];
-	unsigned long pos;
+	int pos;
 	struct timespec i_atime;
   struct timespec i_mtime;
   struct timespec i_ctime;
@@ -82,5 +85,7 @@ int search_available_block(t_fs *fs, int size);
 int add_to_superblock(t_fs *fs, struct stat sb, int pos);
 void setbusy(t_fs *fs, int inode);
 void init_filesystem(t_fs *fs, void *memory, struct stat sb, int fd);
+int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, char *filename, int len);
+int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, char *filename, int len);
 
 #endif
