@@ -12,13 +12,11 @@ void display_blocks(blocks b[MAXBLOC]) {
 
 
 int create_blocks(t_fs *fs) {
-  blocks *b;
   int pos;
   int i;
 
   i = 0;
   pos = SIZEHEADER;
-  b = NULL;
   while (i < MAXBLOC) {
     fs->blocks[i].pos = pos;
     fs->blocks[i].available = TRUE;

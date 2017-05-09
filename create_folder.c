@@ -18,13 +18,11 @@ myfolder *new_folder(int inode) {
 }
 
 int add_folder_to_filestruct(t_fs *fs, int pos, const char *name) {
-  int pos;
-  inode ino;
-
-  //remplir ino
-  create_inode(fs);
-  pos = search_available_block(fs, FIRSTLINE);
-  add_info_line_to_fs_by_inode(fs, ino, char *filename, int len)
+  create_inode(fs, name, fs->nb_files, pos, FIRSTLINE, 'd');
+  add_info_line_to_fs_by_inode(fs, fs->tab_inode[pos], name, ft_strlen(name));
+  fs->blocks[fs->nb_files].available = FALSE;
+  fs->blocks[fs->nb_files].inode = pos;
+  fs->nb_files += 1;
   return (1);
 }
 

@@ -14,11 +14,13 @@
 #define TYPEFOLDER 1
 #define FIRSTLINE MAX_POS + MAX_SIZE + MAX_FILES + MAX_NAMELEN + MAX_TIME * 3 + MAX_INODE + TYPEFILE
 #define SIZEINODELINE 277
-// #define SIZEHEADER (SIZETOTAL / SIZEBLOC) * SIZEINODELINE + FIRSTLINE
 #define SIZEHEADER FIRSTLINE
-#define MAXBLOC (SIZETOTAL - SIZEHEADER) / SIZEBLOC
+#define MAXBLOC ((SIZETOTAL - SIZEHEADER) / SIZEBLOC)
 #define FALSE 0
 #define TRUE 1
+// #define SIZEHEADER (SIZETOTAL / SIZEBLOC) * SIZEINODELINE + FIRSTLINE
+
+//dd if=/dev/zero of=mem.img  bs=1M  count=400
 
 
 #include "libft.h"
@@ -29,7 +31,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include <time.h>
 
 typedef struct blocks {
 	int pos;
@@ -41,9 +43,9 @@ typedef struct inode {
 	int available;
 	char inode[SIZEINODELINE];
 	int pos;
-	struct timespec i_atime;
-  struct timespec i_mtime;
-  struct timespec i_ctime;
+	int i_atime;
+  int i_mtime;
+  int i_ctime;
 	int size;
 	int name_len;
 	int type;
@@ -66,10 +68,10 @@ typedef struct filesystem {
   struct stat sb;
   int nb_files;
 	int i_currentfolder;
-  inode tab_inode[MAXBLOC];
+  inode *tab_inode; // taille maxbloc
   void *data;
   int fd;
-	blocks blocks[MAXBLOC];
+	blocks *blocks; // taille maxbloc
 	superblock s_block;
 	struct myfolder *folder;
 } t_fs;
@@ -81,11 +83,14 @@ void init_inode(inode *i);
 int add_file_to_fs(char *filename, t_fs *fs);
 void create_folder(t_fs *fs, const char *folder, int pos);
 int create_blocks(t_fs *fs);
-int search_available_block(t_fs *fs, int size);
+int search_available_block(t_fs *fs, int size, int *nb_blocks);
 int add_to_superblock(t_fs *fs, struct stat sb, int pos);
-void setbusy(t_fs *fs, int inode);
+void setbusy(t_fs *fs, int i, int inode);
 void init_filesystem(t_fs *fs, void *memory, struct stat sb, int fd);
-int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, char *filename, int len);
-int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, char *filename, int len);
+int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, const char *filename, int len);
+int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, const char *filename, int len);
+void create_inode(t_fs *fs, const char *name, int i, int pos, int size, int type);
+void create_inode_with_timestamp(t_fs *fs, const char *name, int i, int pos, int size, int type, int i_atime, int i_mtime, int i_ctime);
+void display_all_fs(t_fs fs);
 
 #endif
