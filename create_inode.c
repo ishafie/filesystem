@@ -2,6 +2,7 @@
 
 void init_inode(inode *i) {
   i->pos = 0;
+  i->available = TRUE;
 }
 /*
 int fill_inode(char inode[SIZEINODELINE], char *name, int max, int index) {

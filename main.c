@@ -41,11 +41,12 @@ int main(int argc, char** argv) {
 
   (void)argc;
   (void)argv;
-  create_filesystem("mem.img", &fs);
+  /*create_filesystem("mem.img", &fs);
   add_file_to_fs("toto.txt", &fs);
   add_file_to_fs("tutu.txt", &fs);
   add_file_to_fs("greatfile.txt", &fs);
-  add_file_to_fs("toto.txt", &fs);
+  add_file_to_fs("toto.txt", &fs);*/
+  read_filesystem("mem.img", &fs);
   display_all_fs(fs);
 	return 0;
 }

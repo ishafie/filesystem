@@ -18,7 +18,7 @@ myfolder *new_folder(int inode) {
 }
 
 int add_folder_to_filestruct(t_fs *fs, int pos, const char *name) {
-  create_inode(fs, name, fs->nb_files, pos, FIRSTLINE, 'd');
+  create_inode(fs, name, fs->nb_files, pos, 0, 'd');
   add_info_line_to_fs_by_inode(fs, fs->tab_inode[pos], name, ft_strlen(name));
   fs->blocks[fs->nb_files].available = FALSE;
   fs->blocks[fs->nb_files].inode = pos;

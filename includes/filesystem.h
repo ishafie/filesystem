@@ -12,7 +12,7 @@
 #define SIZEBLOC 1024
 #define TYPEFILE 0
 #define TYPEFOLDER 1
-#define FIRSTLINE MAX_POS + MAX_SIZE + MAX_FILES + MAX_NAMELEN + MAX_TIME * 3 + MAX_INODE + TYPEFILE
+#define FIRSTLINE MAX_SIZE + MAX_FILES + MAX_NAMELEN + MAX_TIME * 3 + MAX_INODE + TYPEFILE
 #define SIZEINODELINE 277
 #define SIZEHEADER FIRSTLINE
 #define MAXBLOC ((SIZETOTAL - SIZEHEADER) / SIZEBLOC)
@@ -87,10 +87,11 @@ int search_available_block(t_fs *fs, int size, int *nb_blocks);
 int add_to_superblock(t_fs *fs, struct stat sb, int pos);
 void setbusy(t_fs *fs, int i, int inode);
 void init_filesystem(t_fs *fs, void *memory, struct stat sb, int fd);
-int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, const char *filename, int len);
-int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, const char *filename, int len);
+int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, const char *filename, int len, int pos_of_actual_block);
+int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, const char *filename, int len, int pos_of_actual_block);
 void create_inode(t_fs *fs, const char *name, int i, int pos, int size, int type);
 void create_inode_with_timestamp(t_fs *fs, const char *name, int i, int pos, int size, int type, int i_atime, int i_mtime, int i_ctime);
 void display_all_fs(t_fs fs);
+int read_filesystem(char *fs_name, t_fs *fs);
 
 #endif
