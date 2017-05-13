@@ -21,6 +21,19 @@ int search_available_block(t_fs *fs, int size, int *nb_blocks) {
   return (-1);
 }
 
+int search_inode_block(t_fs *fs, int inode) {
+    int i;
+
+    while (i < MAXBLOC) {
+      if (inode > i)
+        return (-1);
+      if (inode == fs->blocks[i].inode)
+        return (i);
+      i++;
+    }
+    return (-1);
+}
+
 void setbusy(t_fs *fs, int i, int inode) {
   fs->blocks[i].available = FALSE;
   fs->blocks[i].inode = inode;

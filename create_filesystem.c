@@ -200,6 +200,9 @@ int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, const char *filename, 
     type = 'f';
   else
     type = 'd';
+  lseek(fs->fd, SEEK_SET, pos_of_actual_block);
+  printf("size: %d | pos: %d | total = %d\n", SIZEBLOC, pos_of_actual_block, pos_of_actual_block + SIZEBLOC);
+
   write(fs->fd, &type, 1);
   write_according_to_field(fs->fd, atim, ft_strlen(atim), MAX_TIME);
   write_according_to_field(fs->fd, mtim, ft_strlen(mtim), MAX_TIME);
@@ -207,7 +210,6 @@ int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, const char *filename, 
   write_according_to_field(fs->fd, size, ft_strlen(size), MAX_SIZE);
   write_according_to_field(fs->fd, filename, len, MAX_FILES);
   write_according_to_field(fs->fd, inodefolder, ft_strlen(inodefolder), MAX_INODE);
-  lseek(fs->fd, SEEK_SET, pos_of_actual_block + SIZEBLOC);
   // PROTOTYPE, le problème était que le curseur n'est pas mit au début du rpochain bloc apres avoir ecrit.
   free(atim);
   free(mtim);
@@ -231,6 +233,8 @@ int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, const char *filename, int l
   size = ft_itoa((int)(sb.size));
   inodefolder = ft_itoa(fs->i_currentfolder);
   type = sb.type ? 'd' : 'f';
+  lseek(fs->fd, SEEK_SET, pos_of_actual_block);
+  printf("size: %d | pos: %d | total = %d\n", SIZEBLOC, pos_of_actual_block, pos_of_actual_block + SIZEBLOC);
   write(fs->fd, &type, 1);
   write_according_to_field(fs->fd, atim, ft_strlen(atim), MAX_TIME);
   write_according_to_field(fs->fd, mtim, ft_strlen(mtim), MAX_TIME);
@@ -238,7 +242,6 @@ int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, const char *filename, int l
   write_according_to_field(fs->fd, size, ft_strlen(size), MAX_SIZE);
   write_according_to_field(fs->fd, filename, len, MAX_FILES);
   write_according_to_field(fs->fd, inodefolder, ft_strlen(inodefolder), MAX_INODE);
-  lseek(fs->fd, SEEK_SET, pos_of_actual_block + SIZEBLOC);
   free(atim);
   free(mtim);
   free(ctim);
@@ -273,10 +276,12 @@ int add_file_to_fs(char *filename, t_fs *fs) {
   if (index_block == -1) {
     err_handler("espace insuffisant.");
   }
-  printf("nb_blocks = %d, index_block = %d\n", nb_blocks, fs->blocks[index_block].pos);
+  //printf("nb_blocks = %d, index_block = %d\n", nb_blocks, fs->blocks[index_block].pos);
   tmp = (char*)mmap(fs->data + fs->blocks[index_block].pos, sb.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
-  lseek(fs->fd, SEEK_SET, fs->blocks[index_block].pos);
+  printf("first = %d", fs->blocks[index_block].pos);
+  // lseek(fs->fd, SEEK_SET, fs->blocks[index_block].pos);
   add_file_to_filestruct(fs, filename, index_block, sb.st_size);
+  printf("INDEX BLOCK = %d\n", index_block);
   add_info_line_to_fs_by_stat(fs, sb, filename, len, fs->blocks[index_block].pos);
   write(fs->fd, tmp, sb.st_size); /* ECRIRE DANS FS */
   while (i < nb_blocks) {

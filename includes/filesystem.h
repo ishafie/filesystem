@@ -76,7 +76,7 @@ typedef struct filesystem {
 	struct myfolder *folder;
 } t_fs;
 
-
+int search_inode_block(t_fs *fs, int inode);
 int create_filesystem(char *fs_name, t_fs *fs);
 void err_handler(char *err);
 void init_inode(inode *i);
