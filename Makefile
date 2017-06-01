@@ -1,6 +1,16 @@
 NAME		=				filesystem
 
-SRC			=				line_edition/buffer_parse.c \
+SRC			=				action_blocks.c \
+								create_blocks.c \
+								create_filesystem.c \
+								create_folder.c \
+								create_inode.c \
+								display_file.c \
+								err.c \
+								my_mkdir.c \
+								my_ls.c \
+								main.c \
+								line_edition/buffer_parse.c \
 								line_edition/display.c \
 								line_edition/display_line.c \
 								line_edition/edit_line.c \
@@ -25,8 +35,6 @@ SRC			=				line_edition/buffer_parse.c \
 								line_edition/struct.c \
 								line_edition/term_error.c \
 								line_edition/to_is.c \
-								main.c \
-								
 
 OBJ_NAME	=		$(SRC:.c=.o)
 OBJ_PATH	=		obj/

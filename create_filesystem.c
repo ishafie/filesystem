@@ -39,7 +39,7 @@ int create_filesystem(char *fs_name, t_fs *fs)
     err_handler("mmap");
   init_filesystem(fs, memory, sb, fd);
   create_blocks(fs);
-  create_folder(fs, ".", 0);
+  create_folder(fs, ".");
   fs->i_currentfolder = 0;
   return (1);
 }

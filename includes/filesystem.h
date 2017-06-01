@@ -49,6 +49,7 @@ typedef struct inode {
 	int size;
 	int name_len;
 	int type;
+	int folder_inode;
 	char name[BUFFER_STR];
 	char path[BUFFER_STR];
 	struct blocks *block;
@@ -56,8 +57,8 @@ typedef struct inode {
 
 typedef struct myfolder {
 	int inode;
-	int inodes[MAX_FILES];
 	struct myfolder *children;
+	struct myfolder *next;
 } myfolder;
 
 typedef struct super_block {
@@ -76,12 +77,18 @@ typedef struct filesystem {
 	struct myfolder *folder;
 } t_fs;
 
+void display_actual_folder(t_fs *fs);
+myfolder *get_actual_folder(t_fs *fs);
+void display_all_folder(t_fs *fs);
+int my_ls(t_fs *fs, char **args);
+int my_mkdir(t_fs *fs, char **args);
+int			get_all_function(t_fs *fs, char ***args);
 int search_inode_block(t_fs *fs, int inode);
 int create_filesystem(char *fs_name, t_fs *fs);
 void err_handler(char *err);
 void init_inode(inode *i);
 int add_file_to_fs(char *filename, t_fs *fs);
-void create_folder(t_fs *fs, const char *folder, int pos);
+void create_folder(t_fs *fs, const char *folder);
 int create_blocks(t_fs *fs);
 int search_available_block(t_fs *fs, int size, int *nb_blocks);
 int add_to_superblock(t_fs *fs, struct stat sb, int pos);

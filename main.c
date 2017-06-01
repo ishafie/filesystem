@@ -38,12 +38,16 @@ void display_all_fs(t_fs fs) {
   }
 }
 
-int			get_all_function(char ***args)
+int			get_all_function(t_fs *fs, char ***args)
 {
 	if (!args || !(*args) || !((*args)[0]))
 		return (0);
 	if (ft_strcmp((*args)[0], "exit") == 0)
 		return (my_exit(*args));
+  else if (ft_strcmp((*args)[0], "mkdir") == 0)
+    return (my_mkdir(fs, *args));
+  else if (ft_strcmp((*args)[0], "ls") == 0)
+      return (my_ls(fs, *args));
 	return (0);
 }
 
@@ -54,7 +58,7 @@ int 		split_and_use_commands(char *line, t_fs *fs) {
 	if (!cmd || !cmd[0])
 		return (0);
 	printf("%s\n", line);
-	get_all_function(&cmd);
+	get_all_function(fs, &cmd);
 	(void)fs;
 	/*
   add_file_to_fs("toto.txt", &fs);
@@ -76,7 +80,7 @@ int			loop_prompt(t_env *e)
 	line = NULL;
 	env = get_t_env(NULL);
 	(void)fs;
-	//create_filesystem("mem.img", &fs);
+	create_filesystem("mem.img", &fs);
 	while (42)
 	{
 		display_prompt(e);
