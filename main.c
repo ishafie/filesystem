@@ -98,15 +98,22 @@ int			loop_prompt(t_env *e)
 	}
 }
 
-int		main(int ac, char **av, char **env)
+int		main(void)
 {
 	struct termios		reset;
 	t_le				le;
 	t_env				*data_env;
 
-	(void)ac;
-	(void)av;
-	(void)env;
+  G_BUFFER_STR = 0;
+  G_MAX_POS = 0;
+  G_MAX_SIZE = 0;
+  G_MAX_TIME = 0;
+  G_MAX_INODE = 0;
+  G_MAX_FILES = 0;
+  G_MAX_NAMELEN = 0;
+  G_SIZETOTAL = 0;
+  G_SIZEBLOC = 0;
+  G_SIZEINODELINE = 0;
 	if (tcgetattr(0, &reset) == -1)
 		message_handling();
 	g_name_prog = NULL;

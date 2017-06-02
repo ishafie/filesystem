@@ -1,8 +1,100 @@
 #include "filesystem.h"
 
-void init_filesystem(t_fs *fs, void *memory, struct stat sb, int fd) {
+int ft_isnumber(const char *str) {
   int i;
 
+  i = 0;
+  while (str[i]) {
+    if (!ft_isdigit(str[i]))
+      return (0);
+    i++;
+  }
+  return (1);
+}
+
+
+int close_and_return(int fd) {
+  close(fd);
+  return (0);
+}
+
+int is_filesystem(const char *name) {
+  // FONCTION A VALGRINDER
+  int fd;
+  char bufstr[4];
+  char maxpos[3];
+  char maxsize[3];
+  char maxtime[3];
+  char maxinode[3];
+  char maxfiles[2];
+  char maxnamelen[4];
+  char sizetotal[10];
+  char sizebloc[5];
+  char sizeinodeline[4];
+
+  fd = open(name, O_RDONLY, 0755);
+  if (fd == -1)
+    err_handler("open");
+  if (read(fd, bufstr, 3) <= 0 || !ft_isnumber(bufstr))
+    return (close_and_return(fd));
+  if (read(fd, maxpos, 2) <= 0 || !ft_isnumber(maxpos))
+    return (close_and_return(fd));
+  if (read(fd, maxsize, 2) <= 0 || !ft_isnumber(maxsize))
+    return (close_and_return(fd));
+  if (read(fd, maxtime, 2) <= 0 || !ft_isnumber(maxtime))
+    return (close_and_return(fd));
+  if (read(fd, maxinode, 2) <= 0 || !ft_isnumber(maxinode))
+    return (close_and_return(fd));
+  if (read(fd, maxfiles, 1) <= 0 || !ft_isnumber(maxfiles))
+    return (close_and_return(fd));
+  if (read(fd, maxnamelen, 3) <= 0 || !ft_isnumber(maxnamelen))
+    return (close_and_return(fd));
+  if (read(fd, sizetotal, 9) <= 0 || !ft_isnumber(sizetotal))
+    return (close_and_return(fd));
+  if (read(fd, sizebloc, 4) <= 0 || !ft_isnumber(sizebloc))
+    return (close_and_return(fd));
+  if (read(fd, sizeinodeline, 3) < 0 || !ft_isnumber(sizeinodeline))
+    return (close_and_return(fd));
+  close(fd);
+  G_BUFFER_STR = atoi(bufstr);
+  G_MAX_POS = atoi(maxpos);
+  G_MAX_SIZE = atoi(maxsize);
+  G_MAX_TIME = atoi(maxtime);
+  G_MAX_INODE = atoi(maxinode);
+  G_MAX_FILES = atoi(maxfiles);
+  G_MAX_NAMELEN = atoi(maxnamelen);
+  G_SIZETOTAL = atoi(sizetotal);
+  G_SIZEBLOC = atoi(sizebloc);
+  G_SIZEINODELINE = atoi(sizeinodeline);
+  return (1);
+}
+
+void init_filesystem(t_fs *fs, void *memory, struct stat sb, int fd) {
+  int i;
+  char superblock[255];
+  int i_sb;
+
+  i_sb = 0;
+  strncpy(superblock, "255", 3);
+  i_sb += 3;
+  strncpy(&(superblock[i_sb]), "10", 2);
+  i_sb += 2;
+  strncpy(&(superblock[i_sb]), "10", 2);
+  i_sb += 2;
+  strncpy(&(superblock[i_sb]), "10", 2);
+  i_sb += 2;
+  strncpy(&(superblock[i_sb]), "10", 2);
+  i_sb += 2;
+  strncpy(&(superblock[i_sb]), "128", 3);
+  i_sb += 3;
+  strncpy(&(superblock[i_sb]), "3", 1);
+  i_sb += 1;
+  strncpy(&(superblock[i_sb]), "400000000", 9);
+  i_sb += 9;
+  strncpy(&(superblock[i_sb]), "1024", 4);
+  i_sb += 4;
+  strncpy(&(superblock[i_sb]), "277", 3);
+  i_sb += 3;
   i = 0;
   fs->tab_inode = (inode*)malloc(sizeof(inode) * MAXBLOC);
   if (!fs->tab_inode)
@@ -14,6 +106,7 @@ void init_filesystem(t_fs *fs, void *memory, struct stat sb, int fd) {
   fs->sb = sb;
   fs->nb_files = 0;
   fs->data = memory;
+  strncpy(fs->data, superblock, i_sb);
   fs->s_block.pos = 0;
   fs->i_currentfolder = 0;
   fs->folder = NULL;
@@ -134,8 +227,8 @@ void get_header(t_fs *fs, const char *mem, int *i) {
     fs->nb_files += 1;
     //size -= FIRSTLINE;
     *i += size;
-    printf("size : %d\n", size);
-    printf("next chars pour %d : [%c][%c][%c]\n", *i, mem[*i - 1], mem[*i + 1], mem[*i + 2]);
+    //printf("size : %d\n", size);
+    //printf("next chars pour %d : [%c][%c][%c]\n", *i, mem[*i - 1], mem[*i + 1], mem[*i + 2]);
 }
 
 void read_blocks(t_fs *fs, const char *mem) {

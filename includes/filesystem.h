@@ -21,7 +21,16 @@
 // #define SIZEHEADER (SIZETOTAL / SIZEBLOC) * SIZEINODELINE + FIRSTLINE
 
 //dd if=/dev/zero of=mem.img  bs=1M  count=400
-
+int G_BUFFER_STR;
+int G_MAX_POS;
+int G_MAX_SIZE;
+int G_MAX_TIME;
+int G_MAX_INODE;
+int G_MAX_FILES;
+int G_MAX_NAMELEN;
+int G_SIZETOTAL;
+int G_SIZEBLOC;
+int G_SIZEINODELINE;
 
 #include "libft.h"
 #include <stdio.h>
