@@ -19,16 +19,16 @@ void display_all_folder(t_fs *fs) {
 }
 
 void display_actual_folder(t_fs *fs) {
-  myfolder *tmp;
+  int i;
 
-  if (!fs || !fs->folder)
+  i = 1;
+  if (!fs)
     return ;
-  tmp = get_actual_folder(fs);
-  if (fs->i_currentfolder == 0 && tmp)
-    tmp = tmp->next;
   printf(".\n..\n");
-  while (tmp) {
-    printf("%s\n", fs->tab_inode[tmp->inode].name);
-    tmp = tmp->next;
+  while (i < MAX_FILES) {
+    if (fs->tab_inode[i].folder_inode == fs->i_currentfolder) {
+      printf("%s\n", fs->tab_inode[i].name);
+    }
+    i++;
   }
 }

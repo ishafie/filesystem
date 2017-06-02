@@ -18,7 +18,10 @@ void init_filesystem(t_fs *fs, void *memory, struct stat sb, int fd) {
   fs->i_currentfolder = 0;
   fs->folder = NULL;
   while (i < MAXBLOC) {
-    init_inode(&fs->tab_inode[i]);
+    fs->tab_inode[i].folder_inode = -1;
+    fs->tab_inode[i].available = TRUE;
+    fs->tab_inode[i].pos = 0;
+    fs->tab_inode[i].path[0] = 0;
     i++;
   }
 }
@@ -170,7 +173,7 @@ int read_filesystem(char *fs_name, t_fs *fs) {
 }
 
 
-void write_according_to_field(int fd, const char *str, int len, int max) {
+void write_according_to_field(t_fs *fs, const char *str, int len, int max, int pos) {
   char spaces[max - len];
   int i;
 
@@ -179,8 +182,13 @@ void write_according_to_field(int fd, const char *str, int len, int max) {
     spaces[i] = ' ';
     i++;
   }
-  write(fd, str, len);
-  write(fd, spaces, max - len);
+  strncpy(&(fs->data[pos]), str, len);
+  pos += len;
+  strncpy(&(fs->data[pos]), spaces, max - len);
+
+
+  //write(fd, str, len);
+  //write(fd, spaces, max - len);
 }
 
 int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, const char *filename, int len, int pos_of_actual_block) {
@@ -200,17 +208,34 @@ int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, const char *filename, 
     type = 'f';
   else
     type = 'd';
-  lseek(fs->fd, SEEK_SET, pos_of_actual_block);
   printf("size: %d | pos: %d | total = %d\n", SIZEBLOC, pos_of_actual_block, pos_of_actual_block + SIZEBLOC);
-
-  write(fs->fd, &type, 1);
-  write_according_to_field(fs->fd, atim, ft_strlen(atim), MAX_TIME);
-  write_according_to_field(fs->fd, mtim, ft_strlen(mtim), MAX_TIME);
-  write_according_to_field(fs->fd, ctim, ft_strlen(ctim), MAX_TIME);
-  write_according_to_field(fs->fd, size, ft_strlen(size), MAX_SIZE);
-  write_according_to_field(fs->fd, filename, len, MAX_FILES);
-  write_according_to_field(fs->fd, inodefolder, ft_strlen(inodefolder), MAX_INODE);
-  // PROTOTYPE, le problème était que le curseur n'est pas mit au début du rpochain bloc apres avoir ecrit.
+  printf("write from %d ", pos_of_actual_block);
+  strncpy(&(fs->data[pos_of_actual_block]), &type, 1);
+  pos_of_actual_block++;
+  printf("to %d\n", pos_of_actual_block);
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, atim, ft_strlen(atim), MAX_TIME, pos_of_actual_block);
+  pos_of_actual_block += MAX_TIME;
+  printf("to %d\n", pos_of_actual_block);
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, mtim, ft_strlen(mtim), MAX_TIME, pos_of_actual_block);
+  pos_of_actual_block += MAX_TIME;
+  printf("to %d\n", pos_of_actual_block);
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, ctim, ft_strlen(ctim), MAX_TIME, pos_of_actual_block);
+  pos_of_actual_block += MAX_TIME;
+  printf("to %d\n", pos_of_actual_block);
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, size, ft_strlen(size), MAX_SIZE, pos_of_actual_block);
+  pos_of_actual_block += MAX_SIZE;
+  printf("to %d\n", pos_of_actual_block);
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, filename, len, MAX_FILES, pos_of_actual_block);
+  pos_of_actual_block += MAX_FILES;
+  printf("to %d\n", pos_of_actual_block);
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, inodefolder, ft_strlen(inodefolder), MAX_INODE, pos_of_actual_block);
+  printf("to end\n");
   free(atim);
   free(mtim);
   free(ctim);
@@ -219,6 +244,10 @@ int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, const char *filename, 
   return (1);
 }
 
+/*
+  pos_of_actual_block est la position du block selon le numéro d'inode
+  il nous faut donc avoir un block différent par fichier/dossier
+*/
 int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, const char *filename, int len, int pos_of_actual_block) {
   char *atim;
   char *mtim;
@@ -227,21 +256,44 @@ int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, const char *filename, int l
   char *inodefolder;
   char type;
 
+  if (len > MAX_FILES)
+    err_handler("Filename length superior than max. availalble\n");
   atim = ft_itoa((int)(sb.i_atime));
   mtim = ft_itoa((int)(sb.i_mtime));
   ctim = ft_itoa((int)(sb.i_ctime));
   size = ft_itoa((int)(sb.size));
   inodefolder = ft_itoa(fs->i_currentfolder);
   type = sb.type ? 'd' : 'f';
-  lseek(fs->fd, SEEK_SET, pos_of_actual_block);
   printf("size: %d | pos: %d | total = %d\n", SIZEBLOC, pos_of_actual_block, pos_of_actual_block + SIZEBLOC);
-  write(fs->fd, &type, 1);
-  write_according_to_field(fs->fd, atim, ft_strlen(atim), MAX_TIME);
-  write_according_to_field(fs->fd, mtim, ft_strlen(mtim), MAX_TIME);
-  write_according_to_field(fs->fd, ctim, ft_strlen(ctim), MAX_TIME);
-  write_according_to_field(fs->fd, size, ft_strlen(size), MAX_SIZE);
-  write_according_to_field(fs->fd, filename, len, MAX_FILES);
-  write_according_to_field(fs->fd, inodefolder, ft_strlen(inodefolder), MAX_INODE);
+  printf("write from %d ", pos_of_actual_block);
+  strncpy(&(fs->data[pos_of_actual_block]), &type, 1);
+  pos_of_actual_block++;
+  printf("to %d\n", pos_of_actual_block);
+
+  /*write(fs->fd, &type, 1);*/
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, atim, ft_strlen(atim), MAX_TIME, pos_of_actual_block);
+  pos_of_actual_block += MAX_TIME;
+  printf("to %d\n", pos_of_actual_block);
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, mtim, ft_strlen(mtim), MAX_TIME, pos_of_actual_block);
+  pos_of_actual_block += MAX_TIME;
+  printf("to %d\n", pos_of_actual_block);
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, ctim, ft_strlen(ctim), MAX_TIME, pos_of_actual_block);
+  pos_of_actual_block += MAX_TIME;
+  printf("to %d\n", pos_of_actual_block);
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, size, ft_strlen(size), MAX_SIZE, pos_of_actual_block);
+  pos_of_actual_block += MAX_SIZE;
+  printf("to %d\n", pos_of_actual_block);
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, filename, len, MAX_FILES, pos_of_actual_block);
+  pos_of_actual_block += MAX_FILES;
+  printf("to %d\n", pos_of_actual_block);
+  printf("write from %d ", pos_of_actual_block);
+  write_according_to_field(fs, inodefolder, ft_strlen(inodefolder), MAX_INODE, pos_of_actual_block);
+  printf("to end\n");
   free(atim);
   free(mtim);
   free(ctim);
@@ -278,17 +330,18 @@ int add_file_to_fs(char *filename, t_fs *fs) {
   }
   //printf("nb_blocks = %d, index_block = %d\n", nb_blocks, fs->blocks[index_block].pos);
   tmp = (char*)mmap(fs->data + fs->blocks[index_block].pos, sb.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
-  printf("first = %d", fs->blocks[index_block].pos);
+  printf("pos = %d\n", fs->blocks[index_block].pos);
   // lseek(fs->fd, SEEK_SET, fs->blocks[index_block].pos);
   add_file_to_filestruct(fs, filename, index_block, sb.st_size);
   printf("INDEX BLOCK = %d\n", index_block);
   add_info_line_to_fs_by_stat(fs, sb, filename, len, fs->blocks[index_block].pos);
-  write(fs->fd, tmp, sb.st_size); /* ECRIRE DANS FS */
+  strncpy(&(fs->data[fs->blocks[index_block].pos]), tmp, sb.st_size);
+  //write(fs->fd, tmp, sb.st_size);
+  printf("nb blocks taken = %d\n", nb_blocks);
   while (i < nb_blocks) {
     setbusy(fs, index_block + i, fs->nb_files);
     i++;
   }
-  //add_to_superblock(fs);
   fs->nb_files += 1;
   return (1);
 }

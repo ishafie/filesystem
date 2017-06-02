@@ -14,15 +14,25 @@ myfolder *new_folder(int inode) {
 
 int add_folder_to_filestruct(t_fs *fs, int pos, const char *name) {
   int pos_of_actual_block;
+  int index_block;
+  int nb_blocks;
 
-  pos_of_actual_block = search_inode_block(fs, pos);
+  nb_blocks = 0;
+  index_block = search_available_block(fs, 0, &nb_blocks);
+  pos_of_actual_block = fs->blocks[index_block].pos;
+  printf("index block = %d\n", index_block);
+  printf("pos before = %d & inode = %d\n", pos_of_actual_block, pos);
   if (pos_of_actual_block == -1)
     pos_of_actual_block = 0;
+  printf("pos now = %d\n", pos_of_actual_block);
   create_inode(fs, name, fs->nb_files, pos, 0, 'd');
-  //add_info_line_to_fs_by_inode(fs, fs->tab_inode[pos], name, ft_strlen(name), pos_of_actual_block);
-  fs->blocks[fs->nb_files].available = FALSE;
-  fs->blocks[fs->nb_files].inode = fs->nb_files;
+  add_info_line_to_fs_by_inode(fs, fs->tab_inode[pos], name, ft_strlen(name), pos_of_actual_block);
   fs->nb_files += 1;
+  write(1, "[", 1);
+  write(1, fs->data, 3000); //test
+  write(1, "]\n", 2);
+  fs->blocks[index_block].available = FALSE;
+  fs->blocks[index_block].inode = fs->nb_files;
   return (1);
 }
 
@@ -78,15 +88,14 @@ void create_folder(t_fs *fs, const char *folder) {
 
   tmp = NULL;
   i = 0;
-  while (fs->tab_inode[i].available == 0) {
+  while (i < MAXBLOC && fs->tab_inode[i].available == FALSE) {
     i++;
   }
-  printf("folder created at [%d]\n", i);
+  printf("inode dispo = %d\n", i);
   add_folder_to_filestruct(fs, i, folder);
   if (!fs->folder)
     fs->folder = new_folder(i);
   else {
-    printf("trying to find [%d]\n", fs->i_currentfolder);
     tmp = get_actual_folder(fs);
     if (!tmp)
       return;
@@ -95,6 +104,4 @@ void create_folder(t_fs *fs, const char *folder) {
     else
       add_folder_back(&tmp, i);
   }
-  //A AJOUTER DANS LE FICHIER FILESTRUCT FILE PLUS TARD
-
 }

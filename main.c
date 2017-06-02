@@ -47,7 +47,9 @@ int			get_all_function(t_fs *fs, char ***args)
   else if (ft_strcmp((*args)[0], "mkdir") == 0)
     return (my_mkdir(fs, *args));
   else if (ft_strcmp((*args)[0], "ls") == 0)
-      return (my_ls(fs, *args));
+    return (my_ls(fs, *args));
+  else if (ft_strcmp((*args)[0], "add") == 0)
+    return (my_add(fs, *args));
 	return (0);
 }
 

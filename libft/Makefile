@@ -88,14 +88,14 @@ NAME		=		libft.a
 FLAGS		=		-Wall -Wextra -Werror
 
 $(NAME): $(OBJ)
-	ar rc $(NAME) $(OBJ)
-	ranlib $(NAME)
+	@ar rc $(NAME) $(OBJ)
+	@ranlib $(NAME)
 
 all: $(NAME)
 
 $(OBJ_PATH)%.o: %.c
 	@mkdir -p obj
-	gcc -c $(FLAGS) -I includes $< -o $@
+	@gcc -c $(FLAGS) -I includes $< -o $@
 
 clean:
 	rm -rf $(OBJ_PATH)

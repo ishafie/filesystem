@@ -2,12 +2,12 @@
 # define FILESYSTEM_H
 
 #define BUFFER_STR 255
-#define MAX_POS 9
-#define MAX_SIZE 9
+#define MAX_POS 10
+#define MAX_SIZE 10
 #define MAX_FILES 128
 #define MAX_NAMELEN 3
-#define MAX_TIME 9
-#define MAX_INODE 9
+#define MAX_TIME 10
+#define MAX_INODE 10
 #define SIZETOTAL 400000000
 #define SIZEBLOC 1024
 #define TYPEFILE 0
@@ -70,18 +70,20 @@ typedef struct filesystem {
   int nb_files;
 	int i_currentfolder;
   inode *tab_inode; // taille maxbloc
-  void *data;
+  char *data;
   int fd;
 	blocks *blocks; // taille maxbloc
 	superblock s_block;
 	struct myfolder *folder;
 } t_fs;
-
 void display_actual_folder(t_fs *fs);
 myfolder *get_actual_folder(t_fs *fs);
 void display_all_folder(t_fs *fs);
+
 int my_ls(t_fs *fs, char **args);
 int my_mkdir(t_fs *fs, char **args);
+int my_add(t_fs *fs, char **args);
+
 int			get_all_function(t_fs *fs, char ***args);
 int search_inode_block(t_fs *fs, int inode);
 int create_filesystem(char *fs_name, t_fs *fs);

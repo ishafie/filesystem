@@ -9,6 +9,7 @@ SRC			=				action_blocks.c \
 								err.c \
 								my_mkdir.c \
 								my_ls.c \
+								my_add.c \
 								main.c \
 								line_edition/buffer_parse.c \
 								line_edition/display.c \
@@ -40,13 +41,13 @@ OBJ_NAME	=		$(SRC:.c=.o)
 OBJ_PATH	=		obj/
 OBJ			=		$(addprefix $(OBJ_PATH), $(OBJ_NAME))
 
-FLAGS		=		-Wall -Wextra -Werror
+FLAGS		=		-Wall -Wextra -g
 
 .PHONY: all, clean, fclean, re
 
 $(NAME): $(OBJ)
-	make -C libft
-	gcc -o $(NAME) $(FLAGS)  $(OBJ) -lcurses -lft -L ./libft -I includes
+	@make -C libft
+	@gcc -o $(NAME) $(FLAGS)  $(OBJ) -lcurses -lft -L ./libft -I includes
 
 all: $(NAME)
 
