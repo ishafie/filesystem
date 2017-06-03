@@ -17,10 +17,13 @@ static int			my_exit_error(int a)
 int					my_exit(char **args)
 {
 	int		i;
+	t_env *env;
 
 	i = 0;
 	history(FIRST_HIST, NULL);
 	history(WRITE_HIST, NULL);
+	env = get_t_env(NULL);
+	reset_term(env->reset);
 	if (!args || !(*args) || !(args[1]))
 		exit(0);
 	if (args[1] && args[2])

@@ -85,6 +85,13 @@ typedef struct filesystem {
 	superblock s_block;
 	struct myfolder *folder;
 } t_fs;
+
+void clear_str(char **str, int size);
+int	my_exit(char **args);
+int is_filesystem(const char *name);
+
+void get_superblock(t_fs *fs, const char *mem);
+
 void display_actual_folder(t_fs *fs);
 myfolder *get_actual_folder(t_fs *fs);
 void display_all_folder(t_fs *fs);
@@ -97,6 +104,7 @@ int			get_all_function(t_fs *fs, char ***args);
 int search_inode_block(t_fs *fs, int inode);
 int create_filesystem(char *fs_name, t_fs *fs);
 void err_handler(char *err);
+void err_default(char *err);
 void init_inode(inode *i);
 int add_file_to_fs(char *filename, t_fs *fs);
 void create_folder(t_fs *fs, const char *folder);

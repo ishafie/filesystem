@@ -72,7 +72,68 @@ int 		split_and_use_commands(char *line, t_fs *fs) {
 	return (1);
 }
 
-int			loop_prompt(t_env *e)
+void exec_dd(char *dd, char *zero, char *name, char *sizeone, char *size) {
+  char *makefs[] = {dd, zero, name, sizeone, size, NULL};
+
+  execvp(makefs[0], makefs);
+}
+
+void create_file(char **argv, int argc, t_fs *fs) {
+  char namedd[256];
+  char name[256];
+  char size[10];
+  int status;
+
+  status = 0;
+  strcpy(name, "mem.img");
+  strcpy(size, "count=400");
+  strcpy(namedd, "of=mem.img");
+  if (fork() == 0) {
+    if (argc > 2) {
+      ft_bzero(&name, sizeof(name));
+      ft_bzero(&namedd, sizeof(namedd));
+      strcpy(name, argv[2]);
+      strcpy(namedd, "of=");
+      strcat(namedd, argv[2]);
+      namedd[strlen(argv[2]) + 3] = 0;
+      if (argc > 3) {
+        ft_bzero(&size, sizeof(size));
+        strcpy(size, "count=");
+        strcat(size, argv[3]);
+        size[strlen(argv[3]) + 6] = 0;
+      }
+    }
+    printf("namedd = %s\nsize=%s\n", namedd, size);
+    exec_dd("dd", "if=/dev/zero", namedd, "bs=1M", size);
+  }
+  else {
+    wait(&status);
+    if (status != 0) {
+      err_default("echec de la création du filesystem.");
+    }
+    create_filesystem(name, fs);
+  }
+}
+
+void install_filesystem(int argc, char **argv, t_fs *fs) {
+  if (argc < 2) {
+    create_file(argv, argc, fs);
+    return ;
+  }
+  else {
+    if (strcmp(argv[1], "create") == 0) {
+      create_file(argv, argc, fs);
+    }
+    else if (argc > 2 && strcmp(argv[1], "read") == 0 && is_filesystem(argv[2])) {
+      read_filesystem(argv[2], fs);
+    }
+    else
+      err_default("Invalid arguments.");
+    return ;
+  }
+}
+
+int			loop_prompt(int argc, char **argv, t_env *e)
 {
 	char	*line;
 	t_line	*add_to_hist;
@@ -81,8 +142,7 @@ int			loop_prompt(t_env *e)
 
 	line = NULL;
 	env = get_t_env(NULL);
-	(void)fs;
-	create_filesystem("mem.img", &fs);
+  install_filesystem(argc, argv, &fs);
 	while (42)
 	{
 		display_prompt(e);
@@ -98,7 +158,7 @@ int			loop_prompt(t_env *e)
 	}
 }
 
-int		main(void)
+int		main(int argc, char **argv)
 {
 	struct termios		reset;
 	t_le				le;
@@ -125,7 +185,7 @@ int		main(void)
 		message_handling();
 	init_env(&le, data_env);
 	data_env->le = le;
-	loop_prompt(data_env);
+	loop_prompt(argc, argv, data_env);
 	//free_env(&data_env);
 	reset_term(reset);
 	return (0);

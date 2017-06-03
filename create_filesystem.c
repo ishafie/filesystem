@@ -5,67 +5,69 @@ int ft_isnumber(const char *str) {
 
   i = 0;
   while (str[i]) {
-    if (!ft_isdigit(str[i]))
+    if (!ft_isdigit(str[i])) {
+      fprintf(stderr, "NaN\n");
       return (0);
+    }
     i++;
   }
   return (1);
 }
 
 
-int close_and_return(int fd) {
+int close_and_return(int fd, int nb) {
+  char err[10][30] =
+  {
+    "size of buffer",
+    "maximum position",
+    "maximum of time",
+    "maximum of inode",
+    "maximum number of files",
+    "maximum of filename",
+    "maximum of total size",
+    "maximum of size bloc",
+    "maximum of inode line"
+  };
+
+  fprintf(stderr, "Error in %s\n", err[nb]);
   close(fd);
   return (0);
 }
 
 int is_filesystem(const char *name) {
-  // FONCTION A VALGRINDER
   int fd;
-  char bufstr[4];
-  char maxpos[3];
-  char maxsize[3];
-  char maxtime[3];
-  char maxinode[3];
-  char maxfiles[2];
-  char maxnamelen[4];
-  char sizetotal[10];
-  char sizebloc[5];
-  char sizeinodeline[4];
+  char vars[10][10];
+  int nbchar[10] = {3, 2, 2, 2, 2, 3, 1, 9, 4, 3};
+  int i;
+  int size;
 
+  size = (int)(sizeof(vars) / sizeof(vars[0]));
+  i = 0;
+  while (i < size) {
+    ft_bzero(vars[i], sizeof(vars[i]));
+    i++;
+  }
   fd = open(name, O_RDONLY, 0755);
   if (fd == -1)
     err_handler("open");
-  if (read(fd, bufstr, 3) <= 0 || !ft_isnumber(bufstr))
-    return (close_and_return(fd));
-  if (read(fd, maxpos, 2) <= 0 || !ft_isnumber(maxpos))
-    return (close_and_return(fd));
-  if (read(fd, maxsize, 2) <= 0 || !ft_isnumber(maxsize))
-    return (close_and_return(fd));
-  if (read(fd, maxtime, 2) <= 0 || !ft_isnumber(maxtime))
-    return (close_and_return(fd));
-  if (read(fd, maxinode, 2) <= 0 || !ft_isnumber(maxinode))
-    return (close_and_return(fd));
-  if (read(fd, maxfiles, 1) <= 0 || !ft_isnumber(maxfiles))
-    return (close_and_return(fd));
-  if (read(fd, maxnamelen, 3) <= 0 || !ft_isnumber(maxnamelen))
-    return (close_and_return(fd));
-  if (read(fd, sizetotal, 9) <= 0 || !ft_isnumber(sizetotal))
-    return (close_and_return(fd));
-  if (read(fd, sizebloc, 4) <= 0 || !ft_isnumber(sizebloc))
-    return (close_and_return(fd));
-  if (read(fd, sizeinodeline, 3) < 0 || !ft_isnumber(sizeinodeline))
-    return (close_and_return(fd));
+  i = 0;
+  while (i < size) {
+    printf("reading %d from %d\n", nbchar[i], i);
+    if (read(fd, vars[i], nbchar[i]) <= 0 || !ft_isnumber(vars[i]))
+      return (close_and_return(fd, i));
+    i++;
+  }
+  G_BUFFER_STR = atoi(vars[0]);
+  G_MAX_POS = atoi(vars[1]);
+  G_MAX_SIZE = atoi(vars[2]);
+  G_MAX_TIME = atoi(vars[3]);
+  G_MAX_INODE = atoi(vars[4]);
+  G_MAX_FILES = atoi(vars[5]);
+  G_MAX_NAMELEN = atoi(vars[6]);
+  G_SIZETOTAL = atoi(vars[7]);
+  G_SIZEBLOC = atoi(vars[8]);
+  G_SIZEINODELINE = atoi(vars[9]);
   close(fd);
-  G_BUFFER_STR = atoi(bufstr);
-  G_MAX_POS = atoi(maxpos);
-  G_MAX_SIZE = atoi(maxsize);
-  G_MAX_TIME = atoi(maxtime);
-  G_MAX_INODE = atoi(maxinode);
-  G_MAX_FILES = atoi(maxfiles);
-  G_MAX_NAMELEN = atoi(maxnamelen);
-  G_SIZETOTAL = atoi(sizetotal);
-  G_SIZEBLOC = atoi(sizebloc);
-  G_SIZEINODELINE = atoi(sizeinodeline);
   return (1);
 }
 
@@ -235,6 +237,10 @@ void read_blocks(t_fs *fs, const char *mem) {
   int i;
 
   i = 0;
+  i = FIRSTLINE;
+  printf("[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n",
+  G_BUFFER_STR, G_MAX_POS, G_MAX_SIZE, G_MAX_TIME, G_MAX_INODE, G_MAX_FILES,
+  G_MAX_NAMELEN, G_SIZETOTAL, G_SIZEBLOC, G_SIZEINODELINE);
   while (i < SIZETOTAL) {
     get_header(fs, mem, &i);
     printf("tour de boucle i = %d\n", i);
@@ -256,6 +262,9 @@ int read_filesystem(char *fs_name, t_fs *fs) {
   memory = mmap(NULL, sb.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
   if (memory == MAP_FAILED)
     err_handler("mmap");
+  write(1, "[", 1);
+  write(1, memory, 3000); //test
+  write(1, "]\n", 2);
   init_filesystem(fs, memory, sb, fd);
   create_blocks(fs);
   read_blocks(fs, memory);
