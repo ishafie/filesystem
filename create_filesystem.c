@@ -1,5 +1,9 @@
 #include "filesystem.h"
 
+/*
+  GERER LE CAS FICHIER MEME NOM
+
+*/
 void testd(t_fs *fs) {
   int i;
 

@@ -31,8 +31,8 @@ void create_inode(t_fs *fs, const char *name, int i, int pos, int size, int type
   ft_strcpy(fs->tab_inode[i].name, name);
   if (fs->i_currentfolder != i)
     ft_strcpy(fs->tab_inode[i].path, fs->tab_inode[fs->i_currentfolder].path);
-  ft_strcat(fs->tab_inode[i].path, name);
-  ft_strcat(fs->tab_inode[i].path, "/");
+  /*ft_strcat(fs->tab_inode[i].path, name);
+  ft_strcat(fs->tab_inode[i].path, "/");*/
 }
 
 void create_inode_with_timestamp(t_fs *fs, const char *name, int i, int pos,
@@ -50,6 +50,6 @@ void create_inode_with_timestamp(t_fs *fs, const char *name, int i, int pos,
   ft_strcpy(fs->tab_inode[i].name, name);
   if (fs->i_currentfolder != i)
     ft_strcpy(fs->tab_inode[i].path, fs->tab_inode[fs->i_currentfolder].path);
-  ft_strcat(fs->tab_inode[i].path, name);
-  ft_strcat(fs->tab_inode[i].path, "/");
+  /*ft_strcat(fs->tab_inode[i].path, name);
+  ft_strcat(fs->tab_inode[i].path, "/");*/
 }
