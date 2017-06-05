@@ -127,7 +127,6 @@ static int format_arg(t_fs *fs, char *arg, int flags[]) {
 
 void display_different_folder_with_flag(t_fs *fs, char **args, int flags[]) {
   int i;
-  int inode;
 
   i = 1;
   while (args[i]) {

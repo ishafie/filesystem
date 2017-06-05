@@ -54,7 +54,6 @@ int delete_all_inode_folder(t_fs *fs, int inode, int maxblock) {
   printf("maxblock = %d | inode parent = %d | nom = %s\n", maxblock, inode, fs->tab_inode[inode].name);
   while (i <= maxblock) {
     if (fs->tab_inode[i].folder_inode == inode) {
-      //printf(" => %s\n", fs->tab_inode[i].name);
       if (fs->tab_inode[i].type == TYPEFOLDER)
         delete_all_inode_folder(fs, i, maxblock);
       delete_inode(fs, i);

@@ -102,7 +102,6 @@ int is_filesystem(const char *name);
 int already_exist(t_fs *fs, const char *name);
 int cut_with_slashes(t_fs *fs, char *arg, int *i);
 int add_file_to_filestruct(t_fs *fs, const char *name, int i, int inode, int size);
-
 void get_superblock(t_fs *fs, const char *mem);
 
 void display_actual_folder(t_fs *fs);
@@ -117,6 +116,7 @@ int my_cat(t_fs *fs, char **args);
 int my_rename(t_fs *fs, char **args);
 int my_cd(t_fs *fs, char **args);
 int my_cp(t_fs *fs, char **args);
+int my_extend(t_fs *fs, char **args);
 
 int count_args(char **args);
 int	get_all_function(t_fs *fs, char ***args);

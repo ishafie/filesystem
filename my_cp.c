@@ -1,8 +1,6 @@
 #include "filesystem.h"
 
 int copy_file_to_fs(t_fs *fs, int prev_inode) {
-  int fd;
-  struct stat sb;
   char *tmp;
   int nb_blocks;
   int index_block;
@@ -45,10 +43,9 @@ int copy_file_to_fs(t_fs *fs, int prev_inode) {
   return (1);
 }
 
-int my_cp(t_fs *fs, char **args) {
+int copy_one_file_to_folder(t_fs *fs, char **args) {
   int prev_i_currentfolder;
   int inode;
-  int nb;
   int i;
   int inode2;
   int begin;
@@ -57,13 +54,10 @@ int my_cp(t_fs *fs, char **args) {
   inode2 = 0;
   begin = 0;
   i = 0;
-  nb = count_args(args);
-  if (nb != 3)
-    return (fprintf(stderr, "cp: too many/few arguments\n"));
   prev_i_currentfolder = fs->i_currentfolder;
   /*
     CHERCHER LE PREMIER ARGUMENT, STOCKER SON INODE DANS LA VARIABLE
-    INODE
+    INODE.
   */
   if ((begin = cut_with_slashes(fs, args[1], &i)) == -1) {
     fs->i_currentfolder = prev_i_currentfolder;
@@ -76,11 +70,16 @@ int my_cp(t_fs *fs, char **args) {
     fprintf(stderr, "cp: cannot find '%s': No such file or directory\n", args[1]);
     return (0);
   }
+  if (fs->tab_inode[inode].type == TYPEFOLDER) {
+    fs->i_currentfolder = prev_i_currentfolder;
+    fprintf(stderr, "cp: cannot copy directories yet\n");
+    return (0);
+  }
   ft_strdel(&tmp);
-  //display_folder_with_flags(fs, flags);
   fs->i_currentfolder = prev_i_currentfolder;
   /*
-    CHERCHER LE DEUXIEME
+    CHERCHER LE DEUXIEME ARGUMENT (un dossier) ET RECUPERER SON INODE
+    POUR POUVOIR STOCKER INODE1 DANS INODE2
   */
   begin = 0;
   i = 0;
@@ -103,5 +102,16 @@ int my_cp(t_fs *fs, char **args) {
     fs->i_currentfolder = inode2;
   copy_file_to_fs(fs, inode);
   fs->i_currentfolder = prev_i_currentfolder;
+  return (1);
+}
+
+
+int my_cp(t_fs *fs, char **args) {
+  int nb;
+
+  nb = count_args(args);
+  if (nb != 3)
+    return (fprintf(stderr, "cp: too many/few arguments\n"));
+  copy_one_file_to_folder(fs, args);
   return (1);
 }

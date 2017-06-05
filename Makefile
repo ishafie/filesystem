@@ -15,6 +15,7 @@ SRC			=				action_blocks.c \
 								my_cd.c \
 								my_cp.c \
 								my_rename.c \
+								my_extend.c \
 								tools.c \
 								main.c \
 								line_edition/buffer_parse.c \
