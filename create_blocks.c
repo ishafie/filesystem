@@ -1,16 +1,5 @@
 #include "filesystem.h"
 
-void display_blocks(blocks b[MAXBLOC]) {
-  int i;
-
-  i = 0;
-  while (i < MAXBLOC) {
-    printf("blocks pos = %d\n", b[i].pos);
-    i++;
-  }
-}
-
-
 int create_blocks(t_fs *fs) {
   int pos;
   int i;
@@ -20,7 +9,7 @@ int create_blocks(t_fs *fs) {
   while (i < MAXBLOC) {
     fs->blocks[i].pos = pos;
     fs->blocks[i].available = TRUE;
-    fs->blocks[i].inode = 0;
+    fs->blocks[i].inode = -1;
     pos += SIZEBLOC;
     i++;
   }

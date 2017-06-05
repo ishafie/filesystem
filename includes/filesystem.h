@@ -11,11 +11,13 @@
 #define SIZETOTAL 400000000
 #define SIZEBLOC 1024
 #define TYPEFILE 0
-#define TYPEFOLDER 1
-#define FIRSTLINE MAX_SIZE + MAX_FILES + MAX_NAMELEN + MAX_TIME * 3 + MAX_INODE + TYPEFILE
+#define TYPEFOLDER 'd'
+#define FIRSTLINE MAX_SIZE + MAX_FILES + MAX_TIME * 3 + MAX_INODE + 1
 #define SIZEINODELINE 277
 #define SIZEHEADER FIRSTLINE
 #define MAXBLOC ((SIZETOTAL - SIZEHEADER) / SIZEBLOC)
+#define MIN 0
+#define MAX 1
 #define FALSE 0
 #define TRUE 1
 // #define SIZEHEADER (SIZETOTAL / SIZEBLOC) * SIZEINODELINE + FIRSTLINE
@@ -86,6 +88,9 @@ typedef struct filesystem {
 	struct myfolder *folder;
 } t_fs;
 
+void testd(t_fs *fs);
+int display_blocks(t_fs *fs);
+void reset_inode(t_fs *fs, int inode);
 void clear_str(char **str, int size);
 int	my_exit(char **args);
 int is_filesystem(const char *name);
@@ -99,22 +104,25 @@ void display_all_folder(t_fs *fs);
 int my_ls(t_fs *fs, char **args);
 int my_mkdir(t_fs *fs, char **args);
 int my_add(t_fs *fs, char **args);
+int my_rm(t_fs *fs, char **args);
 
-int			get_all_function(t_fs *fs, char ***args);
+int	get_all_function(t_fs *fs, char ***args);
+int search_block_inode(t_fs *fs, int inode);
 int search_inode_block(t_fs *fs, int inode);
+int search_inode_name(t_fs *fs, const char *name);
 int create_filesystem(char *fs_name, t_fs *fs);
 void err_handler(char *err);
 void err_default(char *err);
 void init_inode(inode *i);
 int add_file_to_fs(char *filename, t_fs *fs);
-void create_folder(t_fs *fs, const char *folder);
+void create_folder(t_fs *fs, const char *folder, int infs);
 int create_blocks(t_fs *fs);
 int search_available_block(t_fs *fs, int size, int *nb_blocks);
 int add_to_superblock(t_fs *fs, struct stat sb, int pos);
 void setbusy(t_fs *fs, int i, int inode);
 void init_filesystem(t_fs *fs, void *memory, struct stat sb, int fd);
-int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, const char *filename, int len, int pos_of_actual_block);
-int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, const char *filename, int len, int pos_of_actual_block);
+int _stat(t_fs *fs, struct stat sb, const char *filename, int len, int pos_of_actual_block);
+int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, const char *filename, int len, int pos_of_actual_block, int nbblocks);
 void create_inode(t_fs *fs, const char *name, int i, int pos, int size, int type);
 void create_inode_with_timestamp(t_fs *fs, const char *name, int i, int pos, int size, int type, int i_atime, int i_mtime, int i_ctime);
 void display_all_fs(t_fs fs);

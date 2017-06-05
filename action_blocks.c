@@ -1,5 +1,10 @@
 #include "filesystem.h"
 
+int display_blocks(t_fs *fs) {
+  testd(fs);
+  return (1);
+}
+
 int search_available_block(t_fs *fs, int size, int *nb_blocks) {
   int i;
   int begin;
@@ -38,6 +43,31 @@ int search_inode_block(t_fs *fs, int inode) {
       i++;
     }
     return (-1);
+}
+
+int search_block_inode(t_fs *fs, int inode) {
+  int i;
+
+  i = 0;
+  while (i < MAXBLOC) {
+    if (inode == fs->blocks[i].inode) {
+      return (i);
+    }
+    i++;
+  }
+  return (-1);
+}
+
+int search_inode_name(t_fs *fs, const char *name) {
+  int i;
+
+  i = 0;
+  while (i < MAXBLOC) {
+    if (strcmp(name, fs->tab_inode[i].name) == 0)
+      return (i);
+    i++;
+  }
+  return (-1);
 }
 
 void setbusy(t_fs *fs, int i, int inode) {

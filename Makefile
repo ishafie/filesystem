@@ -10,6 +10,7 @@ SRC			=				action_blocks.c \
 								my_mkdir.c \
 								my_ls.c \
 								my_add.c \
+								my_rm.c \
 								tools.c \
 								main.c \
 								line_edition/buffer_parse.c \

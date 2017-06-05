@@ -8,7 +8,7 @@ int my_mkdir(t_fs *fs, char **args) {
     i = 1;
     while (args[i]) {
       nb_folder++;
-      create_folder(fs, args[i]); //need pos
+      create_folder(fs, args[i], TRUE); //need pos
       i++;
     }
     if (nb_folder == 0) {

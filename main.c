@@ -50,6 +50,10 @@ int			get_all_function(t_fs *fs, char ***args)
     return (my_ls(fs, *args));
   else if (ft_strcmp((*args)[0], "add") == 0)
     return (my_add(fs, *args));
+  else if (ft_strcmp((*args)[0], "rm") == 0)
+    return (my_rm(fs, *args));
+    else if (ft_strcmp((*args)[0], "blocks") == 0)
+      return (display_blocks(fs));
 	return (0);
 }
 
@@ -59,16 +63,7 @@ int 		split_and_use_commands(char *line, t_fs *fs) {
 	cmd = ft_strsplit_space(line);
 	if (!cmd || !cmd[0])
 		return (0);
-	printf("%s\n", line);
 	get_all_function(fs, &cmd);
-	(void)fs;
-	/*
-  add_file_to_fs("toto.txt", &fs);
-  add_file_to_fs("tutu.txt", &fs);
-  add_file_to_fs("greatfile.txt", &fs);
-  add_file_to_fs("toto.txt", &fs);*/
-  /*read_filesystem("mem.img", &fs);*/
-  //display_all_fs(fs);
 	return (1);
 }
 
