@@ -105,6 +105,8 @@ int my_ls(t_fs *fs, char **args);
 int my_mkdir(t_fs *fs, char **args);
 int my_add(t_fs *fs, char **args);
 int my_rm(t_fs *fs, char **args);
+int my_cat(t_fs *fs, char **args);
+int my_rename(t_fs *fs, char **args);
 
 int	get_all_function(t_fs *fs, char ***args);
 int search_block_inode(t_fs *fs, int inode);

@@ -26,7 +26,7 @@ int delete_inode(t_fs *fs, int inode) {
   nb_blocks = (size / SIZEBLOC);
   if (size % SIZEBLOC != 0 || size == 0)
     nb_blocks++;
-  inode = search_block_inode(fs, inode);
+  inode = search_block_inode(fs, inode); // actually index_block, not inode
   inodemax = inode + nb_blocks;
   printf("nbblocks = %d & inode = %d\n", nb_blocks, inode);
   if (inode == -1 || old_inode == 0)
@@ -39,16 +39,8 @@ int delete_inode(t_fs *fs, int inode) {
     inode++;
   }
   pos[MAX] = fs->blocks[inode].pos;
-  /*write(1, "[", 1);
-  write(1, fs->data + pos[MIN], pos[MAX] - pos[MIN]); //test
-  write(1, "]\n", 2);*/
   printf("pos = [%d] to [%d]\n", pos[MIN], pos[MAX]);
   empty_str(&(fs->data[pos[MIN]]), 0, pos[MAX] - pos[MIN]);
-  write(1, "[", 1);
-  write(1, fs->data + pos[MIN], pos[MAX] - pos[MIN]); //test
-  write(1, "]\n", 2);
-  //blocks[inode].available = TRUE;
-  //reset_inode(fs, inode);
   fs->nb_files--;
   return (1);
 }

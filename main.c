@@ -52,8 +52,14 @@ int			get_all_function(t_fs *fs, char ***args)
     return (my_add(fs, *args));
   else if (ft_strcmp((*args)[0], "rm") == 0)
     return (my_rm(fs, *args));
-    else if (ft_strcmp((*args)[0], "blocks") == 0)
-      return (display_blocks(fs));
+  else if (ft_strcmp((*args)[0], "blocks") == 0)
+    return (display_blocks(fs));
+  else if (ft_strcmp((*args)[0], "cat") == 0)
+    return (my_cat(fs, *args));
+    else if (ft_strcmp((*args)[0], "rename") == 0)
+      return (my_rename(fs, *args));
+  else
+    fprintf(stderr, "'%s' : command not found\n", (*args)[0]);
 	return (0);
 }
 
