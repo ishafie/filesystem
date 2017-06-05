@@ -34,6 +34,8 @@ int add_folder_to_filestruct(t_fs *fs, int pos, const char *name) {
   write(1, "]\n", 2);
   fs->blocks[index_block].available = FALSE;
   fs->blocks[index_block].inode = pos;
+  if (index_block > fs->i_maxblockused)
+    fs->i_maxblockused = index_block;
   return (1);
 }
 
@@ -53,6 +55,8 @@ int add_folder_to_struct(t_fs *fs, int pos, const char *name) {
   fs->nb_files += 1;
   fs->blocks[index_block].available = FALSE;
   fs->blocks[index_block].inode = pos;
+  if (index_block > fs->i_maxblockused)
+    fs->i_maxblockused = index_block;
   return (1);
 }
 
@@ -102,7 +106,7 @@ myfolder *get_actual_folder(t_fs *fs) {
   return (ret);
 }
 
-void create_folder(t_fs *fs, const char *folder, int infs) {
+int create_folder(t_fs *fs, const char *folder, int infs) {
   int i;
   myfolder *tmp;
 
@@ -111,6 +115,10 @@ void create_folder(t_fs *fs, const char *folder, int infs) {
   while (i < MAXBLOC && fs->tab_inode[i].available == FALSE) {
     i++;
   }
+  if (already_exist(fs, folder))
+    return (fprintf(stderr, "cannot create directory '%s/': File exists\n", folder));
+  if (i == MAXBLOC)
+    return (fprintf(stderr, "No space left in filesystem\n"));
   printf("inode dispo = %d\n", i);
   if (infs)
     add_folder_to_filestruct(fs, i, folder);
@@ -121,11 +129,11 @@ void create_folder(t_fs *fs, const char *folder, int infs) {
   else {
     tmp = get_actual_folder(fs);
     if (!tmp)
-      return;
+      return (i);
     if (!tmp->next)
       tmp->next = new_folder(i);
     else
       add_folder_back(&tmp, i);
   }
-
+  return (i);
 }

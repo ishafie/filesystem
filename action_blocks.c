@@ -63,7 +63,7 @@ int search_inode_name(t_fs *fs, const char *name) {
 
   i = 0;
   while (i < MAXBLOC) {
-    if (strcmp(name, fs->tab_inode[i].name) == 0)
+    if (strcmp(name, fs->tab_inode[i].name) == 0 && fs->tab_inode[i].folder_inode == fs->i_currentfolder)
       return (i);
     i++;
   }
@@ -73,4 +73,6 @@ int search_inode_name(t_fs *fs, const char *name) {
 void setbusy(t_fs *fs, int i, int inode) {
   fs->blocks[i].available = FALSE;
   fs->blocks[i].inode = inode;
+  if (i > fs->i_maxblockused)
+    fs->i_maxblockused = i;
 }

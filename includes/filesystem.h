@@ -20,6 +20,10 @@
 #define MAX 1
 #define FALSE 0
 #define TRUE 1
+#define L 0
+#define F 1
+#define CREATION 0
+
 // #define SIZEHEADER (SIZETOTAL / SIZEBLOC) * SIZEINODELINE + FIRSTLINE
 
 //dd if=/dev/zero of=mem.img  bs=1M  count=400
@@ -54,9 +58,9 @@ typedef struct inode {
 	int available;
 	char inode[SIZEINODELINE];
 	int pos;
-	int i_atime;
-  int i_mtime;
-  int i_ctime;
+	time_t i_atime;
+  time_t i_mtime;
+  time_t i_ctime;
 	int size;
 	int name_len;
 	int type;
@@ -79,6 +83,7 @@ typedef struct super_block {
 typedef struct filesystem {
   struct stat sb;
   int nb_files;
+	int i_maxblockused;
 	int i_currentfolder;
   inode *tab_inode; // taille maxbloc
   char *data;
@@ -94,6 +99,9 @@ void reset_inode(t_fs *fs, int inode);
 void clear_str(char **str, int size);
 int	my_exit(char **args);
 int is_filesystem(const char *name);
+int already_exist(t_fs *fs, const char *name);
+int cut_with_slashes(t_fs *fs, char *arg, int *i);
+int add_file_to_filestruct(t_fs *fs, const char *name, int i, int inode, int size);
 
 void get_superblock(t_fs *fs, const char *mem);
 
@@ -107,7 +115,10 @@ int my_add(t_fs *fs, char **args);
 int my_rm(t_fs *fs, char **args);
 int my_cat(t_fs *fs, char **args);
 int my_rename(t_fs *fs, char **args);
+int my_cd(t_fs *fs, char **args);
+int my_cp(t_fs *fs, char **args);
 
+int count_args(char **args);
 int	get_all_function(t_fs *fs, char ***args);
 int search_block_inode(t_fs *fs, int inode);
 int search_inode_block(t_fs *fs, int inode);
@@ -117,7 +128,7 @@ void err_handler(char *err);
 void err_default(char *err);
 void init_inode(inode *i);
 int add_file_to_fs(char *filename, t_fs *fs);
-void create_folder(t_fs *fs, const char *folder, int infs);
+int create_folder(t_fs *fs, const char *folder, int infs);
 int create_blocks(t_fs *fs);
 int search_available_block(t_fs *fs, int size, int *nb_blocks);
 int add_to_superblock(t_fs *fs, struct stat sb, int pos);

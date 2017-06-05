@@ -1,4 +1,5 @@
 #include "minishell.h"
+#include "filesystem.h"
 
 static void		display_time(void)
 {
@@ -17,7 +18,7 @@ static void		display_time(void)
 	ft_putstr_fd(STOP, get_fd(-1));
 }
 
-void			display_prompt(t_env *e)
+void			display_prompt(t_env *e, t_fs *fs)
 {
 	char		*tmp;
 
@@ -27,7 +28,11 @@ void			display_prompt(t_env *e)
 	ft_putstr_fd(C_BLUE, e->fd);
 	if (tmp)
 		ft_putstr_fd(tmp, e->fd);
+	ft_putstr_fd(" - ", e->fd);
 	ft_putstr_fd(C_CYAN, e->fd);
+	if (fs) {
+		ft_putstr_fd(fs->tab_inode[fs->i_currentfolder].name, e->fd);
+	}
 	ft_putstr_fd("\n❯❯❯ ", e->fd);
 	ft_putstr_fd(STOP, e->fd);
 }

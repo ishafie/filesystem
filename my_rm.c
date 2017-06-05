@@ -33,6 +33,8 @@ int delete_inode(t_fs *fs, int inode) {
     return (0);
   printf("old inode = %d\n", old_inode);
   reset_inode(fs, old_inode);
+  if (fs->i_maxblockused <= inodemax)
+    fs->i_maxblockused = inode;
   while (inode < inodemax) {
     fs->blocks[inode].available = TRUE;
     fs->blocks[inode].inode = -1;
@@ -42,6 +44,33 @@ int delete_inode(t_fs *fs, int inode) {
   printf("pos = [%d] to [%d]\n", pos[MIN], pos[MAX]);
   empty_str(&(fs->data[pos[MIN]]), 0, pos[MAX] - pos[MIN]);
   fs->nb_files--;
+  return (1);
+}
+//faire doublon apres
+int delete_all_inode_folder(t_fs *fs, int inode, int maxblock) {
+  int i;
+
+  i = 1;
+  printf("maxblock = %d | inode parent = %d | nom = %s\n", maxblock, inode, fs->tab_inode[inode].name);
+  while (i <= maxblock) {
+    if (fs->tab_inode[i].folder_inode == inode) {
+      //printf(" => %s\n", fs->tab_inode[i].name);
+      if (fs->tab_inode[i].type == TYPEFOLDER)
+        delete_all_inode_folder(fs, i, maxblock);
+      delete_inode(fs, i);
+    }
+    i++;
+  }
+  return (1);
+}
+
+int delete_all_inode(t_fs *fs, int inode) {
+  if (fs->tab_inode[inode].type != TYPEFOLDER)
+    return (delete_inode(fs, inode));
+  else {
+    delete_all_inode_folder(fs, inode, fs->i_maxblockused);
+    delete_inode(fs, inode);
+  }
   return (1);
 }
 
@@ -56,10 +85,10 @@ int my_rm(t_fs *fs, char **args) {
   while (args[i]) {
     nb++;
     inode = search_inode_name(fs, args[i]);
-    if (inode == -1)
+    if (inode <= 0)
       fprintf(stderr, "rm: cannot remove '%s': No such file or directory\n", args[i]);
     else
-      delete_inode(fs, inode);
+      delete_all_inode(fs, inode);
     i++;
   }
   if (nb == 0)

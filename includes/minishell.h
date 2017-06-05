@@ -13,6 +13,7 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+# include "filesystem.h"
 # include "libft.h"
 # include "tos.h"
 # include <dirent.h>
@@ -35,7 +36,7 @@ char					*g_name_prog;
 
 t_env					*create_env(void);
 int						my_exit(char **args);
-void					display_prompt(t_env *e);
+void					display_prompt(t_env *e, t_fs *fs);
 void					safe_exit(int a);
 
 

@@ -1,5 +1,6 @@
 #include "minishell.h"
 #include "tos.h"
+#include "filesystem.h"
 
 void			update_size(int sig)
 {
@@ -31,7 +32,7 @@ void			restart_prompt(int sig)
 	(void)sig;
 	env = get_t_env(NULL);
 	ft_putchar_fd('\n', get_fd(-1));
-	display_prompt(env);
+	display_prompt(env, NULL);
 	clear_line(get_first_line(env->le.line));
 	env->le.line = ft_memalloc(sizeof(t_line));
 	env->le.line->is_orig = 1;

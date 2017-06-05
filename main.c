@@ -13,9 +13,9 @@ void display_all_fs(t_fs fs) {
     if (fs.tab_inode[i].available == FALSE) {
       printf("==INODE[%d]==\n", i);
       printf("pos = %d\n", fs.tab_inode[i].pos);
-      printf("timestamp a = %d\n", fs.tab_inode[i].i_atime);
-      printf("timestamp m = %d\n", fs.tab_inode[i].i_mtime);
-      printf("timestamp c = %d\n", fs.tab_inode[i].i_ctime);
+      printf("timestamp a = %ld\n", fs.tab_inode[i].i_atime);
+      printf("timestamp m = %ld\n", fs.tab_inode[i].i_mtime);
+      printf("timestamp c = %ld\n", fs.tab_inode[i].i_ctime);
       printf("size = %d\n", fs.tab_inode[i].size);
       printf("name_len = %d\n", fs.tab_inode[i].name_len);
       if (fs.tab_inode[i].type == TYPEFILE)
@@ -56,8 +56,12 @@ int			get_all_function(t_fs *fs, char ***args)
     return (display_blocks(fs));
   else if (ft_strcmp((*args)[0], "cat") == 0)
     return (my_cat(fs, *args));
-    else if (ft_strcmp((*args)[0], "rename") == 0)
-      return (my_rename(fs, *args));
+  else if (ft_strcmp((*args)[0], "rename") == 0)
+    return (my_rename(fs, *args));
+  else if (ft_strcmp((*args)[0], "cd") == 0)
+    return (my_cd(fs, *args));
+    else if (ft_strcmp((*args)[0], "cp") == 0)
+      return (my_cp(fs, *args));
   else
     fprintf(stderr, "'%s' : command not found\n", (*args)[0]);
 	return (0);
@@ -146,7 +150,7 @@ int			loop_prompt(int argc, char **argv, t_env *e)
   install_filesystem(argc, argv, &fs);
 	while (42)
 	{
-		display_prompt(e);
+		display_prompt(e, &fs);
 		signal(SIGINT, restart_prompt);
 		init_term();
 		add_to_hist = edit_line(&(e->le));

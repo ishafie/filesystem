@@ -12,7 +12,9 @@ void testd(t_fs *fs) {
     if (fs->blocks[i].available == FALSE) {
       printf("BLOCK[%d]\n", i);
       printf("pos = %d\n", fs->blocks[i].pos);
-      printf("inode = %d == [%s]\n", fs->blocks[i].inode, fs->tab_inode[fs->blocks[i].inode].name);
+      printf("inode = %d == [%s] | parent = %d == [%s]\n",
+      fs->blocks[i].inode, fs->tab_inode[fs->blocks[i].inode].name,
+      fs->blocks[fs->tab_inode[i].folder_inode].inode, fs->tab_inode[fs->tab_inode[i].folder_inode].name);
     }
     i++;
   }
@@ -485,6 +487,10 @@ int add_file_to_fs(char *filename, t_fs *fs) {
   while (inode < MAXBLOC && fs->tab_inode[inode].available == FALSE) {
     inode++;
   }
+  if (already_exist(fs, filename))
+    return (fprintf(stderr, "cannot create file %s/’: File exists\n", filename));
+  if (inode == MAXBLOC)
+    return (fprintf(stderr, "No space left in filesystem\n"));
   i = 0;
   nb_blocks = 0;
   len = ft_strlen(filename);
@@ -500,20 +506,12 @@ int add_file_to_fs(char *filename, t_fs *fs) {
   //printf("nb_blocks = %d, index_block = %d\n", nb_blocks, fs->blocks[index_block].pos);
   tmp = (char*)mmap(fs->data + fs->blocks[index_block].pos, sb.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
   printf("pos = %d\n", fs->blocks[index_block].pos);
-  // lseek(fs->fd, SEEK_SET, fs->blocks[index_block].pos);
-  printf("=====1====\n");
-  testd(fs);
   add_file_to_filestruct(fs, filename, index_block, inode, sb.st_size);
-  printf("=====2====\n");
-  testd(fs);
   printf("INDEX BLOCK = %d\n", index_block);
   add_info_line_to_fs_by_stat(fs, sb, filename, len, fs->blocks[index_block].pos, nb_blocks);
-  printf("=====3====\n");
-  testd(fs);
   strncpy(&(fs->data[fs->blocks[index_block].pos + SIZEHEADER]), tmp, sb.st_size);
   printf("=====4====\n");
   testd(fs);
-  //write(fs->fd, tmp, sb.st_size);
   printf("nb blocks taken = %d\n", nb_blocks);
   while (i < nb_blocks) {
     setbusy(fs, index_block + i, inode);

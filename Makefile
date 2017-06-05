@@ -12,6 +12,8 @@ SRC			=				action_blocks.c \
 								my_add.c \
 								my_rm.c \
 								my_cat.c \
+								my_cd.c \
+								my_cp.c \
 								my_rename.c \
 								tools.c \
 								main.c \
