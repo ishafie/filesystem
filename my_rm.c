@@ -11,7 +11,6 @@ void empty_str(char *str, char c, int len) {
 }
 /*
   DELETE PUIS CHECK BLOCK ET ON VOIT CE QUI VA PAS  !
-
 */
 int delete_inode(t_fs *fs, int inode) {
   int pos[2];
@@ -28,10 +27,8 @@ int delete_inode(t_fs *fs, int inode) {
     nb_blocks++;
   inode = search_block_inode(fs, inode); // actually index_block, not inode
   inodemax = inode + nb_blocks;
-  printf("nbblocks = %d & inode = %d\n", nb_blocks, inode);
   if (inode == -1 || old_inode == 0)
     return (0);
-  printf("old inode = %d\n", old_inode);
   reset_inode(fs, old_inode);
   if (fs->i_maxblockused <= inodemax)
     fs->i_maxblockused = inode;
@@ -41,17 +38,15 @@ int delete_inode(t_fs *fs, int inode) {
     inode++;
   }
   pos[MAX] = fs->blocks[inode].pos;
-  printf("pos = [%d] to [%d]\n", pos[MIN], pos[MAX]);
   empty_str(&(fs->data[pos[MIN]]), 0, pos[MAX] - pos[MIN]);
   fs->nb_files--;
   return (1);
 }
-//faire doublon apres
+
 int delete_all_inode_folder(t_fs *fs, int inode, int maxblock) {
   int i;
 
   i = 1;
-  printf("maxblock = %d | inode parent = %d | nom = %s\n", maxblock, inode, fs->tab_inode[inode].name);
   while (i <= maxblock) {
     if (fs->tab_inode[i].folder_inode == inode) {
       if (fs->tab_inode[i].type == TYPEFOLDER)

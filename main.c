@@ -110,7 +110,6 @@ void create_file(char **argv, int argc, t_fs *fs) {
         size[strlen(argv[3]) + 6] = 0;
       }
     }
-    printf("namedd = %s\nsize=%s\n", namedd, size);
     exec_dd("dd", "if=/dev/zero", namedd, "bs=1M", size);
   }
   else {
@@ -187,13 +186,11 @@ int		main(int argc, char **argv)
 	signal(SIGWINCH, update_size);
 	data_env = create_env();
 	data_env->reset = reset;
-	//fill_env(&data_env, env);
 	if (init_term() == 0)
 		message_handling();
 	init_env(&le, data_env);
 	data_env->le = le;
 	loop_prompt(argc, argv, data_env);
-	//free_env(&data_env);
 	reset_term(reset);
 	return (0);
 }

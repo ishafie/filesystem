@@ -72,11 +72,14 @@ int is_filesystem(const char *name) {
     err_handler("open");
   i = 0;
   while (i < size) {
-    printf("reading %d from %d\n", nbchar[i], i);
     if (read(fd, vars[i], nbchar[i]) <= 0 || !ft_isnumber(vars[i]))
       return (close_and_return(fd, i));
     i++;
   }
+  /*
+    Variables globales à utiliser dans le cadre d'un filesystem entièrement
+    paramétrable.
+  */
   G_BUFFER_STR = atoi(vars[0]);
   G_MAX_POS = atoi(vars[1]);
   G_MAX_SIZE = atoi(vars[2]);
@@ -208,7 +211,6 @@ char *get_string(const char *mem, int *i, int size) {
     *i += 1;
     a++;
   }
-  printf("getstring = [%s]\n", local);
   return (local);
 }
 
@@ -230,25 +232,15 @@ void get_header(t_fs *fs, const char *mem, int *i) {
     pos = *i;
     nb_blocks = 1;
     type = mem[*i];
-    printf("type = [%c]\n", type);
     a = 0;
     *i += 1;
     i_atime = get_int(mem, i, MAX_TIME);
-    printf("atime = [%d]\n", i_atime);
     i_mtime = get_int(mem, i, MAX_TIME);
-    printf("mtime = [%d]\n", i_mtime);
     i_ctime = get_int(mem, i, MAX_TIME);
-    printf("ctime = [%d]\n", i_ctime);
     size = get_int(mem, i, MAX_SIZE);
-    printf("size = [%d]\n", size);
     name = get_string(mem, i, MAX_FILES);
-    printf("name = [%s]\n", name);
     inodefolder = get_int(mem, i, MAX_INODE);
-    printf("inodefolder = [%d]\n", inodefolder);
-    printf("===STARTBLOCK===\n");
-    testd(fs);
-    printf("==============\n");
-    printf("i = %d, nbblocks = %d\n", *i, nb_blocks);
+    fs->i_currentfolder = inodefolder;
     *i -= SIZEHEADER;
     if (type == TYPEFOLDER) {
       create_folder(fs, name, FALSE);
@@ -270,35 +262,17 @@ void get_header(t_fs *fs, const char *mem, int *i) {
       fs->nb_files += 1;
     }
     free(name);
-    printf("===ENDBLOCK===\n");
-    testd(fs);
-    printf("==============\n");
-    //size -= FIRSTLINE;
-    //*i += size;
-    //printf("size : %d\n", size);
-    //printf("next chars pour %d : [%c][%c][%c]\n", *i, mem[*i - 1], mem[*i + 1], mem[*i + 2]);
 }
 
 void read_blocks(t_fs *fs, const char *mem) {
   int i;
 
   i = FIRSTLINE;
-  printf("=======> BLOCKS\n");
-  //testd(fs);
-  printf("start [%d]\n", i);
-/*  printf("[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n[%d]\n",
-  G_BUFFER_STR, G_MAX_POS, G_MAX_SIZE, G_MAX_TIME, G_MAX_INODE, G_MAX_FILES,
-  G_MAX_NAMELEN, G_SIZETOTAL, G_SIZEBLOC, G_SIZEINODELINE);*/
   while (i < SIZETOTAL - 1) {
     if (mem[i] != 0) {
       get_header(fs, mem, &i);
       i -= 1;
-      printf("=======> BLOCKS\n");
-      //testd(fs);
-      printf("========[%d] to [%d]\n", i, SIZETOTAL);
     }
-    //printf("tour de boucle i = %d\n", i);
-    //printf("nb files = %d\n", fs->nb_files);
     i++;
   }
 }
@@ -316,16 +290,10 @@ int read_filesystem(char *fs_name, t_fs *fs) {
   memory = mmap(NULL, sb.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
   if (memory == MAP_FAILED)
     err_handler("mmap");
-  write(1, "[", 1);
-  write(1, memory, 200); //test
-  write(1, "]\n", 2);
   init_filesystem(fs, memory, sb, fd);
   create_blocks(fs);
   read_blocks(fs, memory);
   fs->i_currentfolder = 0;
-  /*
-    READ HERE
-  */
   return (1);
 }
 
@@ -342,10 +310,6 @@ void write_according_to_field(t_fs *fs, const char *str, int len, int max, int p
   strncpy(&(fs->data[pos]), str, len);
   pos += len;
   strncpy(&(fs->data[pos]), spaces, max - len);
-
-
-  //write(fd, str, len);
-  //write(fd, spaces, max - len);
 }
 
 int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, const char *filename, int len, int pos_of_actual_block, int nbblocks) {
@@ -367,35 +331,19 @@ int add_info_line_to_fs_by_stat(t_fs *fs, struct stat sb, const char *filename, 
     type = 'f';
   else
     type = 'd';
-  printf("size: %d | pos: %d | total = %d\n", SIZEBLOC, pos_of_actual_block, pos_of_actual_block + SIZEBLOC);
-  printf("write from %d ", pos_of_actual_block);
   strncpy(&(fs->data[pos_of_actual_block]), &type, 1);
   pos_of_actual_block++;
-  printf("to %d\n", pos_of_actual_block);
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, atim, ft_strlen(atim), MAX_TIME, pos_of_actual_block);
   pos_of_actual_block += MAX_TIME;
-  printf("to %d\n", pos_of_actual_block);
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, mtim, ft_strlen(mtim), MAX_TIME, pos_of_actual_block);
   pos_of_actual_block += MAX_TIME;
-  printf("to %d\n", pos_of_actual_block);
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, ctim, ft_strlen(ctim), MAX_TIME, pos_of_actual_block);
   pos_of_actual_block += MAX_TIME;
-  printf("to %d\n", pos_of_actual_block);
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, size, ft_strlen(size), MAX_SIZE, pos_of_actual_block);
   pos_of_actual_block += MAX_SIZE;
-  printf("to %d\n", pos_of_actual_block);
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, filename, len, MAX_FILES, pos_of_actual_block);
   pos_of_actual_block += MAX_FILES;
-  printf("to %d\n", pos_of_actual_block);
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, inodefolder, ft_strlen(inodefolder), MAX_INODE, pos_of_actual_block);
-  printf("to %d\n", pos_of_actual_block);
-
   free(atim);
   free(mtim);
   free(ctim);
@@ -427,36 +375,19 @@ int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, const char *filename, int l
   nb_blocks = ft_itoa(nbblocks);
   inodefolder = ft_itoa(fs->i_currentfolder);
   type = sb.type ? 'd' : 'f';
-  printf("size: %d | pos: %d | total = %d\n", SIZEBLOC, pos_of_actual_block, pos_of_actual_block + SIZEBLOC);
-  printf("write from %d ", pos_of_actual_block);
   strncpy(&(fs->data[pos_of_actual_block]), &type, 1);
   pos_of_actual_block++;
-  printf("to %d\n", pos_of_actual_block);
-
-  /*write(fs->fd, &type, 1);*/
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, atim, ft_strlen(atim), MAX_TIME, pos_of_actual_block);
   pos_of_actual_block += MAX_TIME;
-  printf("to %d\n", pos_of_actual_block);
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, mtim, ft_strlen(mtim), MAX_TIME, pos_of_actual_block);
   pos_of_actual_block += MAX_TIME;
-  printf("to %d\n", pos_of_actual_block);
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, ctim, ft_strlen(ctim), MAX_TIME, pos_of_actual_block);
   pos_of_actual_block += MAX_TIME;
-  printf("to %d\n", pos_of_actual_block);
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, size, ft_strlen(size), MAX_SIZE, pos_of_actual_block);
   pos_of_actual_block += MAX_SIZE;
-  printf("to %d\n", pos_of_actual_block);
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, filename, len, MAX_FILES, pos_of_actual_block);
   pos_of_actual_block += MAX_FILES;
-  printf("to %d\n", pos_of_actual_block);
-  printf("write from %d ", pos_of_actual_block);
   write_according_to_field(fs, inodefolder, ft_strlen(inodefolder), MAX_INODE, pos_of_actual_block);
-  printf("to end\n");
   free(atim);
   free(mtim);
   free(ctim);
@@ -467,8 +398,6 @@ int add_info_line_to_fs_by_inode(t_fs *fs, inode sb, const char *filename, int l
 }
 
 int add_file_to_filestruct(t_fs *fs, const char *name, int i, int inode, int size) {
-
-  printf("inode of tab inode = [%d] +> [%s]\n", inode, name);
   create_inode(fs, name, inode, fs->blocks[i].pos, size, 'f');
   return (1);
 }
@@ -505,14 +434,10 @@ int add_file_to_fs(char *filename, t_fs *fs) {
   }
   //printf("nb_blocks = %d, index_block = %d\n", nb_blocks, fs->blocks[index_block].pos);
   tmp = (char*)mmap(fs->data + fs->blocks[index_block].pos, sb.st_size, PROT_WRITE, MAP_SHARED, fd, 0);
-  printf("pos = %d\n", fs->blocks[index_block].pos);
   add_file_to_filestruct(fs, filename, index_block, inode, sb.st_size);
-  printf("INDEX BLOCK = %d\n", index_block);
   add_info_line_to_fs_by_stat(fs, sb, filename, len, fs->blocks[index_block].pos, nb_blocks);
   strncpy(&(fs->data[fs->blocks[index_block].pos + SIZEHEADER]), tmp, sb.st_size);
-  printf("=====4====\n");
   testd(fs);
-  printf("nb blocks taken = %d\n", nb_blocks);
   while (i < nb_blocks) {
     setbusy(fs, index_block + i, inode);
     i++;

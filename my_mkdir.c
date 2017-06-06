@@ -26,7 +26,6 @@ static int format_arg(t_fs *fs, char *arg) {
     i++;
   }
   tmp = ft_strsub(arg, begin, i - begin);
-  printf("tmp = %s\n", tmp);
   create_folder(fs, tmp, TRUE);
   ft_strdel(&tmp);
   fs->i_currentfolder = prev_i_currentfolder;

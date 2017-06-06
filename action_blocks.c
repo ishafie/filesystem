@@ -11,7 +11,6 @@ int search_available_block(t_fs *fs, int size, int *nb_blocks) {
 
   begin = 0;
   i = 0;
-  printf("size = %d\n", size);
   while (i < MAXBLOC) {
     begin = i;
     while (i < MAXBLOC && fs->blocks[i].available == TRUE && (i - begin) * SIZEBLOC < size) {
@@ -37,7 +36,6 @@ int search_inode_block(t_fs *fs, int inode) {
       if (inode < i)
         return (-1);
       if (inode == fs->blocks[i].inode) {
-        printf("blocks pos = %d\n", fs->blocks[i].pos);
         return (fs->blocks[i].pos);
       }
       i++;

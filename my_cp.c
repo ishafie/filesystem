@@ -26,15 +26,9 @@ int copy_file_to_fs(t_fs *fs, int prev_inode) {
   }
   index_block_prev = search_block_inode(fs, prev_inode);
   tmp = ft_strsub(fs->data, fs->blocks[index_block_prev].pos + SIZEHEADER, fs->tab_inode[prev_inode].size); // RECUPERER LE CONTENU
-  printf("tmp = [%s]\n", tmp);
-  printf("pos = %d\n", fs->blocks[index_block].pos);
   add_file_to_filestruct(fs, fs->tab_inode[prev_inode].name, index_block, inode, fs->tab_inode[prev_inode].size);
-  printf("INDEX BLOCK = %d\n", index_block);
   add_info_line_to_fs_by_inode(fs, fs->tab_inode[prev_inode], fs->tab_inode[prev_inode].name, len, fs->blocks[index_block].pos, nb_blocks);
   strncpy(&(fs->data[fs->blocks[index_block].pos + SIZEHEADER]), tmp, fs->tab_inode[prev_inode].size);
-  printf("=====4====\n");
-  testd(fs);
-  printf("nb blocks taken = %d\n", nb_blocks);
   while (i < nb_blocks) {
     setbusy(fs, index_block + i, inode);
     i++;

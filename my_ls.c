@@ -84,7 +84,6 @@ void display_folder_with_flags(t_fs *fs, int flags[]) {
   while (i < MAX_FILES) {
     if (fs->tab_inode[i].folder_inode == fs->i_currentfolder) {
       if (flags[L] == TRUE) {
-        //-rw-rw-r-- 1 tikko tikko        11 May  8 15:45 tutu.txt
         print_type(fs, i);
         print_date(fs, i, CREATION);
         print_size(fs, i, sizemaxlen);

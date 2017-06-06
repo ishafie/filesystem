@@ -22,7 +22,6 @@ int my_extend(t_fs *fs, char **args) {
     return (0);
   len = strlen(args[2]);
   pos = fs->blocks[index_block].pos + SIZEHEADER + fs->tab_inode[inode].size;
-  printf("begin = %d => HEADER = %d => size = %d => pos = %d\n", fs->blocks[index_block].pos, SIZEHEADER, fs->tab_inode[inode].size, pos);
   size = (fs->tab_inode[inode].size + len);
   nb_blocks = size / SIZEBLOC;
   if (size % SIZEBLOC != 0 || size == 0)
@@ -33,7 +32,6 @@ int my_extend(t_fs *fs, char **args) {
     add_info_line_to_fs_by_inode(fs, fs->tab_inode[inode], fs->tab_inode[inode].name, strlen(fs->tab_inode[inode].name), fs->blocks[index_block].pos, nb_blocks);
   }
   else {
-    printf("extending to next block\n");
     if (fs->blocks[index_block + 1].available == TRUE) {
       strncpy(&fs->data[pos], args[2], len);
       setbusy(fs, index_block + 1, inode);

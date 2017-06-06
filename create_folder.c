@@ -21,17 +21,11 @@ int add_folder_to_filestruct(t_fs *fs, int pos, const char *name) {
   nb_blocks = 0;
   index_block = search_available_block(fs, 0, &nb_blocks);
   pos_of_actual_block = fs->blocks[index_block].pos;
-  printf("index block = %d\n", index_block);
-  printf("pos before = %d & inode = %d\n", pos_of_actual_block, pos);
   if (pos_of_actual_block == -1)
     pos_of_actual_block = 0;
-  printf("pos now = %d\n", pos_of_actual_block);
   create_inode(fs, name, pos, fs->blocks[index_block].pos, 0, 'd');
   add_info_line_to_fs_by_inode(fs, fs->tab_inode[pos], name, ft_strlen(name), pos_of_actual_block, nb_blocks);
   fs->nb_files += 1;
-  write(1, "[", 1);
-  write(1, fs->data, 3000); //test
-  write(1, "]\n", 2);
   fs->blocks[index_block].available = FALSE;
   fs->blocks[index_block].inode = pos;
   if (index_block > fs->i_maxblockused)
@@ -47,8 +41,6 @@ int add_folder_to_struct(t_fs *fs, int pos, const char *name) {
   nb_blocks = 0;
   index_block = search_available_block(fs, 0, &nb_blocks);
   pos_of_actual_block = fs->blocks[index_block].pos;
-  printf("index block = %d\n", index_block);
-  printf("pos before = %d & inode = %d\n", pos_of_actual_block, pos);
   if (pos_of_actual_block == -1)
     pos_of_actual_block = 0;
   create_inode(fs, name, pos, fs->blocks[index_block].pos, 0, 'd');
@@ -85,7 +77,6 @@ myfolder *rec_get_actual_folder(myfolder *racine, int inode) {
     if (ret != NULL)
       return (ret);
     if (tmp->inode == inode) {
-      printf("found\n");
       return (tmp);
     }
     else {
@@ -119,7 +110,6 @@ int create_folder(t_fs *fs, const char *folder, int infs) {
     return (fprintf(stderr, "cannot create directory '%s/': File exists\n", folder));
   if (i == MAXBLOC)
     return (fprintf(stderr, "No space left in filesystem\n"));
-  printf("inode dispo = %d\n", i);
   if (infs)
     add_folder_to_filestruct(fs, i, folder);
   else
